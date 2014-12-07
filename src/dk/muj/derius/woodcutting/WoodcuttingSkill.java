@@ -16,7 +16,7 @@ public class WoodcuttingSkill extends Skill
 	}
 	
 	@Override
-	public String getId()
+	public int getId()
 	{
 		return Const.ID;
 	}
