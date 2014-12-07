@@ -1,4 +1,4 @@
 Derius-Woodcutting
 ==================
 
-Woodcutting skill for the Derius 
+The woodcutting skill for the Derius skill framework https://github.com/Derius/Derius-Core
