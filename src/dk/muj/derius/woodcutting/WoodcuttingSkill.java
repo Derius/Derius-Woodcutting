@@ -5,9 +5,14 @@ import java.util.List;
 
 import dk.muj.derius.entity.MPlayer;
 import dk.muj.derius.skill.Skill;
+import dk.muj.derius.woodcutting.entity.MConf;
 
 public class WoodcuttingSkill extends Skill
 {
+	// -------------------------------------------- //
+	// DESCRIPTION
+	// -------------------------------------------- //
+	
 	public WoodcuttingSkill()
 	{
 		this.addEarnExpDesc("cut wood");
@@ -15,10 +20,14 @@ public class WoodcuttingSkill extends Skill
 		this.addActiveAbilityDesc("Tree harvester", "Harvests a whole tree");
 	}
 	
+	// -------------------------------------------- //
+	// OVERRIDE
+	// -------------------------------------------- //
+	
 	@Override
 	public int getId()
 	{
-		return Const.ID;
+		return MConf.get().getSkillId;
 	}
 
 	@Override

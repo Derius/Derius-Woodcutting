@@ -1,5 +1,7 @@
 package dk.muj.derius.woodcutting;
 
+import dk.muj.derius.woodcutting.entity.MConf;
+
 public class Const
 {
 	// -------------------------------------------- //
@@ -15,6 +17,6 @@ public class Const
 	// SKILL DATA
 	// -------------------------------------------- //
 	
-	public static final int ID = 2;
+	public static final int ID = MConf.get().getSkillId;
 	public static final String NAME = "Woodcutting";
 }

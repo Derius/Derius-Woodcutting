@@ -19,13 +19,33 @@ public class MConf extends Entity<MConf>
 	// -------------------------------------------- //
 	
 	// -------------------------------------------- //
+	// ID DEFINITION
+	// -------------------------------------------- //
+	
+	/* 
+	 * Note: skillId and abilityId are not related,
+	 * but we use the tenners to define the skillId and all the values in between as the abilityId's.
+	 */
+	 
+	/**
+	 * The Id of the skill, there is only one of these in each skill.
+	 */
+	public int getSkillId = 20;
+	
+	/**
+	 * The Id of the Tree harvest Ability. Each ability has it's own Id
+	 */
+	public int getTreeHarvestId = 21;
+	
+	// -------------------------------------------- //
 	// EXP GAIN
 	// -------------------------------------------- //
 	
-	//The first int is the id of the block
-	//The second is the amount of exp gained.
+	/**
+	 * This Map stores, which blockId (first Integer) gives you how many exp (second Integer).
+	 */
 	public Map<Integer, Integer> expGain = MUtil.map(
-			17,	10,
-			162,	50
+			17,	20,
+			162,	20
 			);
 }

@@ -2,12 +2,11 @@ package dk.muj.derius.woodcutting;
 
 import com.massivecraft.massivecore.MassivePlugin;
 
-import dk.muj.derius.woodcutting.DeriusWoodcutting;
-import dk.muj.derius.woodcutting.WoodcuttingListener;
-import dk.muj.derius.woodcutting.WoodcuttingSkill;
-import dk.muj.derius.woodcutting.entity.MConfColl;
+import dk.muj.derius.ability.Abilities;
+import dk.muj.derius.ability.Ability;
 import dk.muj.derius.skill.Skill;
 import dk.muj.derius.skill.Skills;
+import dk.muj.derius.woodcutting.entity.MConfColl;
 
 public class DeriusWoodcutting extends MassivePlugin
 {
@@ -26,6 +25,9 @@ public class DeriusWoodcutting extends MassivePlugin
 		private static Skill WoodcuttingSkill = new WoodcuttingSkill();
 		public static Skill getWoodcuttingSkill () {	return DeriusWoodcutting.WoodcuttingSkill;	}
 		
+		private static Ability TreeHarvest = new TreeHarvest();
+		public static Ability getTreeHarvest() {	return DeriusWoodcutting.TreeHarvest;	}
+		
 		// -------------------------------------------- //
 		// LISTENERS
 		// -------------------------------------------- //
@@ -38,6 +40,7 @@ public class DeriusWoodcutting extends MassivePlugin
 			super.preEnable();
 			
 			Skills.AddSkill(WoodcuttingSkill);
+			Abilities.AddAbility(TreeHarvest);
 			
 			MConfColl.get().init();
 			
