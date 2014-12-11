@@ -33,7 +33,7 @@ public class TreeHarvest extends Ability
 	@Override
 	public int getId()
 	{
-		return MConf.get().getTreeHarvestId;
+		return MConf.get().getTreeHarvestId();
 	}
 	
 	@Override

@@ -29,7 +29,7 @@ public class WoodcuttingSkill extends Skill
 	@Override
 	public int getId()
 	{
-		return MConf.get().getSkillId;
+		return MConf.get().getSkillId();
 	}
 
 	@Override

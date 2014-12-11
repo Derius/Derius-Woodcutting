@@ -26,6 +26,7 @@ public class DoubleDrop extends Ability
 	// DESCRIPTION
 	// -------------------------------------------- //
 
+	@SuppressWarnings("deprecation")
 	public DoubleDrop()
 	{
 		this.setName("Doubledrop");
@@ -45,7 +46,7 @@ public class DoubleDrop extends Ability
 	@Override
 	public int getId()
 	{
-		return MConf.get().getDoubleDropId;
+		return MConf.get().getDoubleDropId();
 	}
 	
 	@Override
@@ -76,6 +77,7 @@ public class DoubleDrop extends Ability
 		
 		Block b = (Block) block;
 		
+		@SuppressWarnings("deprecation")
 		int logId = b.getTypeId();
 		ItemStack inHand = mplayer.getPlayer().getItemInHand();
 		Location loc = b.getLocation();

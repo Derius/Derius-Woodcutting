@@ -30,17 +30,20 @@ public class MConf extends Entity<MConf>
 	/**
 	 * The Id of the skill, there is only one of these in each skill.
 	 */
-	public int getSkillId = 20;
+	private int skillId = 20;
+	public int getSkillId() { return skillId; }
 	
 	/**
 	 * The Id of the Tree harvest Ability. Each ability has it's own Id
 	 */
-	public int getDoubleDropId = 21;
+	private int doubleDropId = 21;
+	public int getDoubleDropId() { return doubleDropId; }
 	
 	/**
 	 * The Id of the Tree harvest Ability. Each ability has it's own Id
 	 */
-	public int getTreeHarvestId = 22;
+	private int treeHarvestId = 22;
+	public int getTreeHarvestId() { return treeHarvestId; }
 	
 	// -------------------------------------------- //
 	// ABILITY REQUIREMENTS
