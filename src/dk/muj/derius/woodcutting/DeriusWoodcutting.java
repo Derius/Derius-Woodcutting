@@ -2,10 +2,8 @@ package dk.muj.derius.woodcutting;
 
 import com.massivecraft.massivecore.MassivePlugin;
 
-import dk.muj.derius.ability.Abilities;
 import dk.muj.derius.ability.Ability;
 import dk.muj.derius.skill.Skill;
-import dk.muj.derius.skill.Skills;
 import dk.muj.derius.woodcutting.entity.MConfColl;
 
 public class DeriusWoodcutting extends MassivePlugin
@@ -32,19 +30,15 @@ public class DeriusWoodcutting extends MassivePlugin
 		// LISTENERS
 		// -------------------------------------------- //
 		
-		WoodcuttingListener listener;
-		
 		@Override
 		public void onEnable()
 		{
 			super.preEnable();
 			
-			Skills.AddSkill(WoodcuttingSkill);
-			Abilities.AddAbility(TreeHarvest);
-			
 			MConfColl.get().init();
 			
-			listener = new WoodcuttingListener(this);
+			WoodcuttingSkill.register();
+			TreeHarvest.register();
 			
 			MConfColl.get().get("Woodcutting", true);
 			

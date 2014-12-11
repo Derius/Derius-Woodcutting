@@ -1,9 +1,5 @@
 package dk.muj.derius.woodcutting;
 
-import java.util.Collection;
-
-import org.bukkit.Material;
-
 import com.massivecraft.massivecore.util.MUtil;
 
 import dk.muj.derius.ability.Ability;
@@ -15,41 +11,26 @@ import dk.muj.derius.woodcutting.entity.MConf;
 public class TreeHarvest extends Ability
 {	
 	// -------------------------------------------- //
-	// OVERRIDE
+	// DESCRIPTION
+	// -------------------------------------------- //
+	
+	public TreeHarvest()
+	{
+		this.setName("Tree Harvest");
+		this.setDescription("Harvests a full tree.");
+		this.setType(AbilityType.ACTIVE);
+		
+		this.addInteractKeys(MUtil.AXE_MATERIALS);
+	}
+	
+	// -------------------------------------------- //
+	// SKILL & ID
 	// -------------------------------------------- //
 	
 	@Override
 	public int getId()
 	{
 		return MConf.get().getTreeHarvestId;
-	}
-
-	@Override
-	public String getName()
-	{
-		return "Tree harvester";
-	}
-
-	@Override
-	public boolean CanPlayerActivateAbility(MPlayer p)
-	{
-		return true;
-	}
-	
-	@Override
-	public void onActivate(MPlayer p)
-	{
-	}
-
-	@Override
-	public void onDeactivate(MPlayer p)
-	{
-	}
-	
-	@Override
-	public Collection<Material> getInteractKeys()
-	{
-		return MUtil.AXE_MATERIALS;
 	}
 	
 	@Override
@@ -58,16 +39,43 @@ public class TreeHarvest extends Ability
 		return DeriusWoodcutting.getWoodcuttingSkill();
 	}
 
-	@Override
-	public AbilityType getType()
-	{
-		// ACTIVE
-		return null;
-	}
+	// -------------------------------------------- //
+	// ABILITY ACTIVATION
+	// -------------------------------------------- //
 
 	@Override
-	public Collection<Material> getBlockBreakKeys()
+	public void onActivate(MPlayer p, Object other)
 	{
-		return null;
+		// Nothing at the moment.
 	}
+	
+	@Override
+	public void onDeactivate(MPlayer p)
+	{
+		// Nothing at the moment.
+	}
+
+	// -------------------------------------------- //
+	// ABILITY ACTIVATION
+	// -------------------------------------------- //
+	
+	@Override
+	public boolean CanPlayerActivateAbility(MPlayer p)
+	{
+		if(p.getLvl(DeriusWoodcutting.getWoodcuttingSkill()) >= MConf.get().getTreeHarvestMinLvl)
+			return true;
+		return false;
+	}
+	
+	// -------------------------------------------- //
+	// Level description
+	// -------------------------------------------- //
+	
+	@Override
+	public String getLvlDescription(int lvl)
+	{
+		return "";
+	}
+	
+
 }

@@ -38,6 +38,15 @@ public class MConf extends Entity<MConf>
 	public int getTreeHarvestId = 21;
 	
 	// -------------------------------------------- //
+	// ABILITY REQUIREMENTS
+	// -------------------------------------------- //
+	
+	/**
+	 * The level the player has to have for executing the tree harvest ability
+	 */
+	public int getTreeHarvestMinLvl = 500;
+	
+	// -------------------------------------------- //
 	// EXP GAIN
 	// -------------------------------------------- //
 	

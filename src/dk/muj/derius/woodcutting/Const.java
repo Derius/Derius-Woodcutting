@@ -18,5 +18,4 @@ public class Const
 	// -------------------------------------------- //
 	
 	public static final int ID = MConf.get().getSkillId;
-	public static final String NAME = "Woodcutting";
 }
