@@ -1,7 +1,5 @@
 package dk.muj.derius.woodcutting;
 
-import dk.muj.derius.woodcutting.entity.MConf;
-
 public class Const
 {
 	// -------------------------------------------- //
@@ -12,10 +10,4 @@ public class Const
 	public static final String BASENAME_ = BASENAME+"_";
 	
 	public static final String COLLECTION_MCONF = BASENAME_+"mconf";
-	
-	// -------------------------------------------- //
-	// SKILL DATA
-	// -------------------------------------------- //
-	
-	public static final int ID = MConf.get().getSkillId;
 }

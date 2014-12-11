@@ -35,7 +35,12 @@ public class MConf extends Entity<MConf>
 	/**
 	 * The Id of the Tree harvest Ability. Each ability has it's own Id
 	 */
-	public int getTreeHarvestId = 21;
+	public int getDoubleDropId = 21;
+	
+	/**
+	 * The Id of the Tree harvest Ability. Each ability has it's own Id
+	 */
+	public int getTreeHarvestId = 22;
 	
 	// -------------------------------------------- //
 	// ABILITY REQUIREMENTS

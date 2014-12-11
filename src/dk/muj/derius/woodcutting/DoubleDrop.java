@@ -45,7 +45,7 @@ public class DoubleDrop extends Ability
 	@Override
 	public int getId()
 	{
-		return MConf.get().getTreeHarvestId;
+		return MConf.get().getDoubleDropId;
 	}
 	
 	@Override
@@ -91,8 +91,8 @@ public class DoubleDrop extends Ability
 			mplayer.AddExp(WoodcuttingSkill.get(), expGain);
 		}
 		
-		if(i.CanAbilityBeUsedInArea(loc) && MConf.get().expGain.containsKey(logId) && 
-				SkillUtil.PlayerGetDoubleDrop(mplayer, skill, 10));
+		if(i.CanAbilityBeUsedInArea(loc) && MConf.get().expGain.containsKey(logId))
+				SkillUtil.PlayerGetDoubleDrop(mplayer, skill, 10);
 	}
 
 	@Override
