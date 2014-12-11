@@ -6,6 +6,10 @@ import dk.muj.derius.woodcutting.entity.MConf;
 
 public class WoodcuttingSkill extends Skill
 {
+	
+	private static WoodcuttingSkill i = new WoodcuttingSkill();
+	public static WoodcuttingSkill get() { return i; }
+	
 	// -------------------------------------------- //
 	// DESCRIPTION
 	// -------------------------------------------- //

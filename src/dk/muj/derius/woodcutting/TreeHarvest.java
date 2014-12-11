@@ -10,6 +10,9 @@ import dk.muj.derius.woodcutting.entity.MConf;
 
 public class TreeHarvest extends Ability
 {	
+	private static TreeHarvest i = new TreeHarvest();
+	public static TreeHarvest get() { return i; }
+	
 	// -------------------------------------------- //
 	// DESCRIPTION
 	// -------------------------------------------- //
@@ -36,7 +39,7 @@ public class TreeHarvest extends Ability
 	@Override
 	public Skill getSkill()
 	{
-		return DeriusWoodcutting.getWoodcuttingSkill();
+		return WoodcuttingSkill.get();
 	}
 
 	// -------------------------------------------- //
@@ -62,7 +65,7 @@ public class TreeHarvest extends Ability
 	@Override
 	public boolean CanPlayerActivateAbility(MPlayer p)
 	{
-		if(p.getLvl(DeriusWoodcutting.getWoodcuttingSkill()) >= MConf.get().getTreeHarvestMinLvl)
+		if(p.getLvl(WoodcuttingSkill.get()) >= MConf.get().getTreeHarvestMinLvl)
 			return true;
 		return false;
 	}
