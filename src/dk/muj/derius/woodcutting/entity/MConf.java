@@ -65,4 +65,5 @@ public class MConf extends Entity<MConf>
 			17,	20,
 			162,	20
 			);
+	
 }
