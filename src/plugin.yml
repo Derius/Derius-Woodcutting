@@ -3,5 +3,5 @@ version: 0.1_dev
 main: dk.muj.derius.woodcutting.DeriusWoodcutting
 #website: http://muj.dk/Derius/Woodcutting
 authors: [ulumulu1510, madus]
-description: §eDerius woodcutting
+description: Â§eDerius woodcutting
 depend: [Derius-Core]

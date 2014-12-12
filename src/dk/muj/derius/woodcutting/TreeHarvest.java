@@ -65,9 +65,12 @@ public class TreeHarvest extends Ability
 	@Override
 	public boolean CanPlayerActivateAbility(MPlayer p)
 	{
+		/*
 		if(p.getLvl(WoodcuttingSkill.get()) >= MConf.get().getTreeHarvestMinLvl)
 			return true;
 		return false;
+		*/
+		return true;
 	}
 	
 	// -------------------------------------------- //

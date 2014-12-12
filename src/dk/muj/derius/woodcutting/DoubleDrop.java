@@ -32,6 +32,7 @@ public class DoubleDrop extends Ability
 		this.setName("Doubledrop");
 		this.setDescription("gives doubledrop");
 		this.setType(AbilityType.PASSIVE);
+		this.setAbilityCheck(true);
 		
 		List<Material> blockBreakKeys = new ArrayList<Material>();
 		for(int i : MConf.get().expGain.keySet())
@@ -93,7 +94,7 @@ public class DoubleDrop extends Ability
 			mplayer.AddExp(WoodcuttingSkill.get(), expGain);
 		}
 		
-		if(i.CanAbilityBeUsedInArea(loc) && MConf.get().expGain.containsKey(logId))
+		if(DoubleDrop.get().CanAbilityBeUsedInArea(loc) && MConf.get().expGain.containsKey(logId))
 				SkillUtil.PlayerGetDoubleDrop(mplayer, skill, 10);
 	}
 
