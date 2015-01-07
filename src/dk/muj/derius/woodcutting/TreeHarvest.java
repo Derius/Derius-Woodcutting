@@ -1,7 +1,5 @@
 package dk.muj.derius.woodcutting;
 
-import com.massivecraft.massivecore.util.MUtil;
-
 import dk.muj.derius.ability.Ability;
 import dk.muj.derius.ability.AbilityType;
 import dk.muj.derius.entity.MPlayer;
@@ -20,10 +18,10 @@ public class TreeHarvest extends Ability
 	public TreeHarvest()
 	{
 		this.setName("Tree Harvest");
-		this.setDescription("Harvests a full tree.");
-		this.setType(AbilityType.ACTIVE);
 		
-		this.addInteractKeys(MUtil.AXE_MATERIALS);
+		this.setDescription("Harvests a full tree.");
+		
+		this.setType(AbilityType.ACTIVE);
 	}
 	
 	// -------------------------------------------- //
@@ -59,27 +57,12 @@ public class TreeHarvest extends Ability
 	}
 
 	// -------------------------------------------- //
-	// ABILITY ACTIVATION
-	// -------------------------------------------- //
-	
-	@Override
-	public boolean CanPlayerActivateAbility(MPlayer p)
-	{
-		/*
-		if(p.getLvl(WoodcuttingSkill.get()) >= MConf.get().getTreeHarvestMinLvl)
-			return true;
-		return false;
-		*/
-		return true;
-	}
-	
-	// -------------------------------------------- //
 	// Level description
 	// -------------------------------------------- //
 	
 	@Override
 	public String getLvlDescription(int lvl)
 	{
-		return "";
+		return "Lasts "+this.getTicksLast(lvl)/20 + " seconds";
 	}
 }

@@ -1,10 +1,6 @@
 package dk.muj.derius.woodcutting;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.inventory.ItemStack;
 
@@ -14,7 +10,7 @@ import dk.muj.derius.ability.Ability;
 import dk.muj.derius.ability.AbilityType;
 import dk.muj.derius.entity.MPlayer;
 import dk.muj.derius.skill.Skill;
-import dk.muj.derius.skill.SkillUtil;
+import dk.muj.derius.util.SkillUtil;
 import dk.muj.derius.woodcutting.entity.MConf;
 
 public class DoubleDrop extends Ability
@@ -26,18 +22,13 @@ public class DoubleDrop extends Ability
 	// DESCRIPTION
 	// -------------------------------------------- //
 
-	@SuppressWarnings("deprecation")
 	public DoubleDrop()
 	{
 		this.setName("Doubledrop");
-		this.setDescription("gives doubledrop");
-		this.setType(AbilityType.PASSIVE);
-		this.setAbilityCheck(true);
 		
-		List<Material> blockBreakKeys = new ArrayList<Material>();
-		for(int i : MConf.get().expGain.keySet())
-			blockBreakKeys.add(Material.getMaterial(i));
-		this.addBlockBreakKeys(blockBreakKeys);
+		this.setDescription("gives doubledrop");
+		
+		this.setType(AbilityType.PASSIVE);
 	}
 		
 	// -------------------------------------------- //
@@ -61,12 +52,6 @@ public class DoubleDrop extends Ability
 	// -------------------------------------------- //
 	
 	@Override
-	public boolean CanPlayerActivateAbility(MPlayer p)
-	{
-		return true;
-	}
-	
-	@Override
 	public void onActivate(MPlayer mplayer, Object block)
 	{
 		if(!(block instanceof Block))
@@ -86,16 +71,11 @@ public class DoubleDrop extends Ability
 		if(!MUtil.isAxe(inHand))
 			return;
 		
-		if(skill.CanSkillBeEarnedInArea(b.getLocation()))
+		if(MConf.get().expGain.containsKey(logId) && SkillUtil.shouldPlayerGetDoubleDrop(mplayer, skill, 10))
 		{
-			if(!MConf.get().expGain.containsKey(logId))
-				return;
-			int expGain = MConf.get().expGain.get(logId);
-			mplayer.AddExp(WoodcuttingSkill.get(), expGain);
+			for(ItemStack is: b.getDrops(inHand))
+				b.getWorld().dropItem(loc, is);
 		}
-		
-		if(DoubleDrop.get().CanAbilityBeUsedInArea(loc) && MConf.get().expGain.containsKey(logId))
-				SkillUtil.PlayerGetDoubleDrop(mplayer, skill, 10);
 	}
 
 	@Override
