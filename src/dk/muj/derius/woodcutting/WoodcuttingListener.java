@@ -27,7 +27,7 @@ public class WoodcuttingListener implements Listener
 	public WoodcuttingListener()
 	{
 		i = this;
-		registerBlockBreakKeys(MConf.get().expGain.keySet().parallelStream().map(Material::getMaterial).collect(Collectors.toList()));
+		registerBlockBreakKeys(MConf.get().expGain.keySet().stream().map(Material::getMaterial).collect(Collectors.toList()));
 		Listener.registerTools(MUtil.AXE_MATERIALS);
 	}
 	

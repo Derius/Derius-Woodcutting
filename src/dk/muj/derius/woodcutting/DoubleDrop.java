@@ -91,6 +91,6 @@ public class DoubleDrop extends Ability
 	@Override
 	public String getLvlDescription(int lvl)
 	{
-		return "chance to double drop" + lvl/10.0 + "%";
+		return "chance to double drop " + lvl/10.0 + "%";
 	}
 }
