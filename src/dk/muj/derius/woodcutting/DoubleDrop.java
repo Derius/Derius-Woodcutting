@@ -1,5 +1,7 @@
 package dk.muj.derius.woodcutting;
 
+import java.util.Optional;
+
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.inventory.ItemStack;
@@ -52,12 +54,12 @@ public class DoubleDrop extends Ability
 	// -------------------------------------------- //
 	
 	@Override
-	public void onActivate(MPlayer mplayer, Object block)
+	public Optional<Object> onActivate(MPlayer mplayer, Object block)
 	{
 		if(!(block instanceof Block))
-			return;
+			return Optional.empty();
 		if(!mplayer.isPlayer())
-			return;
+			return Optional.empty();
 		
 		Skill skill = getSkill();
 		
@@ -69,17 +71,19 @@ public class DoubleDrop extends Ability
 		Location loc = b.getLocation();
 		
 		if(!MUtil.isAxe(inHand))
-			return;
+			return Optional.empty();
 		
 		if(MConf.get().expGain.containsKey(logId) && SkillUtil.shouldPlayerGetDoubleDrop(mplayer, skill, 10))
 		{
 			for(ItemStack is: b.getDrops(inHand))
 				b.getWorld().dropItem(loc, is);
 		}
+		
+		return Optional.empty();
 	}
 
 	@Override
-	public void onDeactivate(MPlayer p)
+	public void onDeactivate(MPlayer p, Optional<Object> other)
 	{
 		// There is nothing to deactivate, a passive ability gets only activated once on runtime
 	}

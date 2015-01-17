@@ -4,7 +4,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.bukkit.Material;
-import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -36,7 +36,7 @@ public class WoodcuttingListener implements Listener
 	// -------------------------------------------- //
 	
 	@Override
-	public void onBlockBreak(MPlayer mplayer, Block block)
+	public void onBlockBreak(MPlayer mplayer, BlockState block)
 	{
 		if ( ! mplayer.isPlayer()) return;
 		Player player = mplayer.getPlayer();
@@ -46,7 +46,7 @@ public class WoodcuttingListener implements Listener
 		
 		if ( ! mplayer.getPreparedTool().equals(Optional.empty()) && MUtil.AXE_MATERIALS.contains(mplayer.getPreparedTool().get()))
 		{
-			mplayer.activateAbility(TreeHarvest.get(), null);
+			mplayer.activateAbility(Timber.get(), null);
 		}
 		
 		@SuppressWarnings("deprecation")

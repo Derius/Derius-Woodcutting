@@ -42,8 +42,8 @@ public class MConf extends Entity<MConf>
 	/**
 	 * The Id of the Tree harvest Ability. Each ability has it's own Id
 	 */
-	private int treeHarvestId = 22;
-	public int getTreeHarvestId() { return treeHarvestId; }
+	private int timberId = 22;
+	public int getTimberId() { return timberId; }
 	
 	// -------------------------------------------- //
 	// ABILITY REQUIREMENTS
@@ -52,7 +52,20 @@ public class MConf extends Entity<MConf>
 	/**
 	 * The level the player has to have for executing the tree harvest ability
 	 */
-	public int getTreeHarvestMinLvl = 500;
+	public int timberMinLvl = 500;
+	public int getTimberMinLvl() { return timberMinLvl; }
+
+	private int logSoftCap = 15;
+	public int getLogSoftCap() { return logSoftCap; }
+	
+	private int logHardCap = 50;
+	public int getLogHardCap() { return logHardCap; }
+	
+	private boolean dropExtraItems = true;
+	public boolean getDropExtraItems() { return dropExtraItems; }
+	
+	private boolean informSurroundingPlayers = true;
+	public boolean getInformSurroundingPlayers() { return informSurroundingPlayers; }
 	
 	// -------------------------------------------- //
 	// EXP GAIN

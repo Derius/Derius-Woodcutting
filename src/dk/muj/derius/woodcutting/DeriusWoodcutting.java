@@ -26,7 +26,7 @@ public class DeriusWoodcutting extends MassivePlugin
 		MConfColl.get().init();
 			
 		WoodcuttingSkill.get().register();
-		TreeHarvest.get().register();
+		Timber.get().register();
 		DoubleDrop.get().register();
 		new WoodcuttingListener();
 	
