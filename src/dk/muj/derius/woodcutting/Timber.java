@@ -52,7 +52,7 @@ public class Timber extends Ability
 	// STATIC
 	// -------------------------------------------- //
 	
-	public final static Set<Material> timberBlocks = MUtil.set(
+	public final static Set<Material> TIMBER_BLOCKS = MUtil.set(
 			Material.LOG, Material.LOG_2, Material.LEAVES, Material.LEAVES_2
 			);
 	
@@ -165,10 +165,13 @@ public class Timber extends Ability
 		
 		while (someLeft.get())
 		{
-			ret.stream().forEach(b -> someLeft.set(ret.addAll(
-					BlockUtil.getSurroundingBlocksWith(b, 
+			someLeft.set(false);
+			ret.stream().forEach( (Block block) -> 
+			{
+			if (ret.addAll(BlockUtil.getSurroundingBlocksWith(block, 
 							MUtil.list(BlockFace.UP, BlockFace.EAST, BlockFace.WEST, BlockFace.NORTH, BlockFace.SOUTH))
-					.stream().filter(timberBlocks::contains).collect(Collectors.toList()))));
+					.stream().filter(TIMBER_BLOCKS::contains).collect(Collectors.toList()))) someLeft.set(true);
+			});
 		}
 		
 		return ret;
