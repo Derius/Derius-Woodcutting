@@ -1,23 +1,30 @@
 package dk.muj.derius.woodcutting;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockState;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import com.massivecraft.massivecore.util.MUtil;
 import com.massivecraft.massivecore.util.Txt;
 
+import dk.muj.derius.Mutable;
 import dk.muj.derius.ability.Ability;
 import dk.muj.derius.ability.AbilityType;
 import dk.muj.derius.entity.MPlayer;
 import dk.muj.derius.req.ReqIsAtleastLevel;
 import dk.muj.derius.skill.Skill;
+import dk.muj.derius.util.BlockUtil;
 import dk.muj.derius.woodcutting.entity.MConf;
 
 public class Timber extends Ability
@@ -40,6 +47,14 @@ public class Timber extends Ability
 		this.addActivateRequirements(ReqIsAtleastLevel.get(MConf.get().getTimberMinLvl()));
 		
 	}
+	
+	// -------------------------------------------- //
+	// STATIC
+	// -------------------------------------------- //
+	
+	public final static Set<Material> timberBlocks = MUtil.set(
+			Material.LOG, Material.LOG_2, Material.LEAVES, Material.LEAVES_2
+			);
 	
 	// -------------------------------------------- //
 	// SKILL & ID
@@ -69,13 +84,13 @@ public class Timber extends Ability
 		if (sourceBlock == null) return Optional.empty();
 		
 		// Tree handling
-		List<BlockState> tree = tree(sourceBlock);
+		Set<Block> tree = tree(sourceBlock);
 		if (tree == null) return Optional.empty();
 		
 		int logs = logCounter(tree);
 		if (logs >= MConf.get().getLogSoftCap() + p.getLvl(getSkill()) / 10) return Optional.empty();
 		
-		tree.stream().iterator().next().getBlock().breakNaturally();
+		tree.stream().forEach(Block::breakNaturally);
 		
 		
 		// Inform surrounding players?
@@ -141,15 +156,28 @@ public class Timber extends Ability
 	// PRIVATE
 	// -------------------------------------------- //
 	
-	private List<BlockState> tree(Block sourceBlock)
+	private Set<Block> tree(Block source)
 	{
-		return null;
+		Set<Block> ret = new HashSet<Block>();
+		ret.add(source);
+		
+		Mutable<Boolean> someLeft = new Mutable<Boolean>(true);
+		
+		while (someLeft.get())
+		{
+			ret.stream().forEach(b -> someLeft.set(ret.addAll(
+					BlockUtil.getSurroundingBlocksWith(b, 
+							MUtil.list(BlockFace.UP, BlockFace.EAST, BlockFace.WEST, BlockFace.NORTH, BlockFace.SOUTH))
+					.stream().filter(timberBlocks::contains).collect(Collectors.toList()))));
+		}
+		
+		return ret;
 	}
 	
-	private int logCounter(List<BlockState> tree)
+	private int logCounter(Collection<Block> tree)
 	{
 		int logCounter = 0;
-		for (BlockState bs : tree)
+		for (Block bs : tree)
 		{
 			if (bs.getType() == Material.LOG || bs.getType() == Material.LOG_2)
 			{
