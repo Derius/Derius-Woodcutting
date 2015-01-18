@@ -70,24 +70,17 @@ public class MConf extends Entity<MConf>
 	private double timberDistance = 25.0;
 	public double getTimberDistance() { return timberDistance; }
 	
-	/*
-	 * Dividers, per how many blocks of log does a 
-	 * item get thrown.
-	 */
-	
-	private int chancePerPlank = 10;
+	// Chances
+	private int chancePerPlank = 5;
 	public int getChancePerPlanks() { return chancePerPlank; }
 	
-	private int chancePerSticks = 20;
+	private int chancePerSticks = 5;
 	public int getChancePerSticks() { return chancePerSticks; }
 	
-	private int chancePerApples = 40;
+	private int chancePerApples = 20;
 	public int getChancePerApples() { return chancePerApples; }
-
-	private int chancePerSaplings = 50;
-	public int getChancePerSaplings() { return chancePerSaplings; }
 	
-	public int randomModifier = 5;
+	public int randomModifier = 2;
 	public int getRandomModifier() { return randomModifier; }
 
 

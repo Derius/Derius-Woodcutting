@@ -11,6 +11,7 @@ import org.bukkit.inventory.ItemStack;
 import com.massivecraft.massivecore.util.MUtil;
 
 import dk.muj.derius.entity.MPlayer;
+import dk.muj.derius.util.AbilityUtil;
 import dk.muj.derius.util.Listener;
 import dk.muj.derius.woodcutting.entity.MConf;
 
@@ -46,7 +47,7 @@ public class WoodcuttingListener implements Listener
 		
 		if ( ! mplayer.getPreparedTool().equals(Optional.empty()) && MUtil.AXE_MATERIALS.contains(mplayer.getPreparedTool().get()))
 		{
-			mplayer.activateAbility(Timber.get(), block.getBlock());
+			AbilityUtil.activateAbility(mplayer, Timber.get(), block.getBlock());
 		}
 		
 		@SuppressWarnings("deprecation")
@@ -56,6 +57,6 @@ public class WoodcuttingListener implements Listener
 			mplayer.addExp(WoodcuttingSkill.get(), exp);
 		}
 		
-		mplayer.activateAbility(DoubleDrop.get(), block);
+		AbilityUtil.activateAbility(mplayer, DoubleDrop.get(), block);
 	}
 }

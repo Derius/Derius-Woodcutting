@@ -29,8 +29,6 @@ public class DeriusWoodcutting extends MassivePlugin
 		Timber.get().register();
 		DoubleDrop.get().register();
 		new WoodcuttingListener();
-	
-		MConfColl.get().get("Woodcutting", true);
 		
 		super.postEnable();
 	}

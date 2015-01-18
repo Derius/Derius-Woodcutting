@@ -8,10 +8,11 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.BlockState;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -28,6 +29,7 @@ import dk.muj.derius.req.ReqIsAtleastLevel;
 import dk.muj.derius.skill.Skill;
 import dk.muj.derius.util.BlockUtil;
 import dk.muj.derius.util.ChatUtil;
+import dk.muj.derius.util.TimingUtil;
 import dk.muj.derius.woodcutting.entity.MConf;
 
 public class Timber extends Ability
@@ -44,6 +46,8 @@ public class Timber extends Ability
 		this.setName("Timber");
 		
 		this.setDescription("Harvests a full tree.");
+		
+		this.setTicksCooldown(400);
 		
 		this.setType(AbilityType.ACTIVE);
 		
@@ -93,28 +97,29 @@ public class Timber extends Ability
 		Block sourceBlock = (Block) block;
 		
 		// Tree handling
-		Set<Block> tree = tree(sourceBlock);
+		Set<Block> tree = tree(sourceBlock, 3);
 		if (tree == null) return Optional.empty();
-		Bukkit.broadcastMessage("Yo! tree got!");
 		
 		int logs = logCounter(tree);
-		if (logs >= MConf.get().getLogSoftCap() + p.getLvl(getSkill()) / 10 || logs >= MConf.get().getLogHardCap()) return Optional.empty();
+		if (logs >= MConf.get().getLogSoftCap() + p.getLvl(getSkill()) / 10 || logs >= MConf.get().getLogHardCap()) 
+		{
+			p.sendMessage(Txt.parse("<b>Tree tree you wanted to cut down was too big for you."));
+			return Optional.empty();
+		}
 		
 		tree.stream().forEach(Block::breakNaturally);
 		
 		
-		// Inform surrounding players?
+		// Inform surrounding players
 		if (MConf.get().getInformSurroundingPlayers())
 		{
 			informSurroundingPlayers(p);
 		}
 		
-		Bukkit.broadcastMessage("Yo! informed!");
-		
 		// Drop extra items
 		if (MConf.get().getDropExtraItems())
 		{
-			dropExtraItems(logs, sourceBlock);
+			dropExtraItems(logs, sourceBlock.getLocation());
 		}
 		
 		// Horribly unnecessary lore added, makes the player feel good
@@ -146,29 +151,35 @@ public class Timber extends Ability
 	// -------------------------------------------- //
 	// PRIVATE
 	// -------------------------------------------- //
-    public static Set<Block> tree(final Block source)
+	public static Set<Block> tree(final Block source, int radius)
     {
+        TimingUtil timing = new TimingUtil("Timber", "tree");
+        timing.startTiming();
+        
         Set<Block> ret = new HashSet<>();
         ret.add(source);
         
-        // int data = source.getData();
-        
         Mutable<Boolean> someLeft = new Mutable<>(true);
         
-        while(someLeft.get())
+        Set<Block> latest = ret;
+        
+        while (someLeft.get())
         {
             someLeft.set(false);
             Set<Block> add = new HashSet<Block>();
-            ret.stream().forEach( (Block block) -> 
+            latest.stream()
+            .forEach( (Block block) -> 
             add.addAll(BlockUtil.getSurroundingBlocksWith(block, TIMBER_FACES)
                     .stream()
-                    .filter(b -> TIMBER_BLOCKS.contains(b.getType()))
+                    .filter(b -> matches(source.getState(), b.getState()))
+                    .filter(b -> Math.abs(b.getX()-source.getX()) <= radius && Math.abs(b.getZ()-source.getZ()) <= radius)
                     .collect(Collectors.toList()))
             );
-            
+            latest = add;
             if (ret.addAll(add)) someLeft.set(true);
         }
         
+        timing.endTiming();
         return ret;
     }
 	
@@ -193,6 +204,8 @@ public class Timber extends Ability
 		
 		for (Player p : players)
 		{
+			if (MPlayer.get(p.getUniqueId()) == mplayer) return;
+			
 			PS ps2 = PS.valueOf(p.getLocation());
 			
 			double distance = PS.locationDistance(ps1, ps2);
@@ -203,31 +216,23 @@ public class Timber extends Ability
 		
 	}
 
-	private void dropExtraItems(int logs, Block dropBlock)
+	
+	private void dropExtraItems(int logs, Location loc)
 	{
-		List<ItemStack> is = new ArrayList<ItemStack>();
-		int num = logs * 100;
+		int num = logs / 100;
 		
 		// Planks
-		int numPlanks =  random((double) (num / MConf.get().getChancePerPlanks()));
-		is.add(new ItemStack(Material.WOOD, numPlanks));
+		int numPlanks =  random((double) (num * MConf.get().getChancePerPlanks()));
+		drop(loc, Material.WOOD, numPlanks = oneZero(numPlanks));
 		
 		// Sticks
-		int numSticks = random((double) (num / MConf.get().getChancePerSticks()));
-		is.add(new ItemStack(Material.STICK, numSticks));
+		int numSticks = random((double) (num * MConf.get().getChancePerSticks()));
+		drop(loc, Material.WOOD, numSticks = oneZero(numSticks));
 		
 		// Apples
-		int numApples = random((double) (num / MConf.get().getChancePerApples()));
-		is.add(new ItemStack(Material.APPLE, numApples));
+		int numApples = random((double) (num * MConf.get().getChancePerApples()));
+		drop(loc, Material.WOOD, numApples = oneZero(numApples));
 		
-		// Saplings
-		int numSaplings = random( (double) (num / MConf.get().getChancePerSaplings()));
-		is.add(new ItemStack(Material.SAPLING, numSaplings));
-		
-		for (ItemStack itemStack : is)
-		{
-			dropBlock.getWorld().dropItem(dropBlock.getLocation(), itemStack);
-		}
 	}
 	
 
@@ -236,6 +241,55 @@ public class Timber extends Ability
 		return (int)((Math.random() * (chance + MConf.get().getRandomModifier())));
 	}
 	
+	private int oneZero(int num)
+	{
+		if (num == 1) return (int)Math.random();
+		return num;
+	}
+	
+	private void drop(Location loc, Material material, int amount)
+	{
+		if (amount == 0) return;
+
+		loc.getBlock().getWorld().dropItem(loc, new ItemStack(material, amount));
+	}
+	
+	// -------------------------------------------- //
+	// MATCHES
+	// -------------------------------------------- //
+	
+    @SuppressWarnings("deprecation")
+    public static boolean matches(BlockState source, BlockState compared)
+    {
+            final int srcId = source.getTypeId();
+            final int compId = compared.getTypeId();
+           
+            int compData = compared.getData().getData();
+            final int srcData = source.getData().getData();
+           
+            if (compData >= 8) compData -= 8;
+           
+            /*Bukkit.broadcastMessage("srcId="+srcId + " srcDat=" + srcData + " compId="+compId + " compDat=" + compData);*/
+           
+            // Oak, Birch & Spruce
+            if (srcId == 17)
+            {
+                    // If not a leave or log
+                    if (compId != 17 && compId != 18) return false;
+                   
+                    return srcData == compData;
+            }
+            // Dark oak & acacia
+            else if (srcId == 162)
+            {
+                    //Acacia
+                    if (srcData == 0) return compId == 161;
+                    if (srcData == 1) return compId == 18 && compData == 0;
+            }
+           
+            return false;
+    }
+    
 	// -------------------------------------------- //
 	// Level description
 	// -------------------------------------------- //
