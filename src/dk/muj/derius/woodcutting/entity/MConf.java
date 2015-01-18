@@ -46,11 +46,11 @@ public class MConf extends Entity<MConf>
 	public int getTimberId() { return timberId; }
 	
 	// -------------------------------------------- //
-	// ABILITY REQUIREMENTS
+	// ABILITY
 	// -------------------------------------------- //
 	
 	/**
-	 * The level the player has to have for executing the tree harvest ability
+	 * The level the player has to have for executing the timber
 	 */
 	public int timberMinLvl = 500;
 	public int getTimberMinLvl() { return timberMinLvl; }
@@ -66,6 +66,31 @@ public class MConf extends Entity<MConf>
 	
 	private boolean informSurroundingPlayers = true;
 	public boolean getInformSurroundingPlayers() { return informSurroundingPlayers; }
+	
+	private double timberDistance = 25.0;
+	public double getTimberDistance() { return timberDistance; }
+	
+	/*
+	 * Dividers, per how many blocks of log does a 
+	 * item get thrown.
+	 */
+	
+	private int chancePerPlank = 10;
+	public int getChancePerPlanks() { return chancePerPlank; }
+	
+	private int chancePerSticks = 20;
+	public int getChancePerSticks() { return chancePerSticks; }
+	
+	private int chancePerApples = 40;
+	public int getChancePerApples() { return chancePerApples; }
+
+	private int chancePerSaplings = 50;
+	public int getChancePerSaplings() { return chancePerSaplings; }
+	
+	public int randomModifier = 5;
+	public int getRandomModifier() { return randomModifier; }
+
+
 	
 	// -------------------------------------------- //
 	// EXP GAIN

@@ -16,6 +16,7 @@ public class WoodcuttingSkill extends Skill
 	public WoodcuttingSkill()
 	{
 		this.setName("Woodcutting");
+		
 		this.setDescription("Makes you better at woodcutting.");
 		
 		this.addEarnExpDesc("Cut wood!");

@@ -46,7 +46,7 @@ public class WoodcuttingListener implements Listener
 		
 		if ( ! mplayer.getPreparedTool().equals(Optional.empty()) && MUtil.AXE_MATERIALS.contains(mplayer.getPreparedTool().get()))
 		{
-			mplayer.activateAbility(Timber.get(), null);
+			mplayer.activateAbility(Timber.get(), block.getBlock());
 		}
 		
 		@SuppressWarnings("deprecation")

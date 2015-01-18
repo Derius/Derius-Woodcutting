@@ -8,6 +8,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -15,6 +16,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import com.massivecraft.massivecore.ps.PS;
 import com.massivecraft.massivecore.util.MUtil;
 import com.massivecraft.massivecore.util.Txt;
 
@@ -25,6 +27,7 @@ import dk.muj.derius.entity.MPlayer;
 import dk.muj.derius.req.ReqIsAtleastLevel;
 import dk.muj.derius.skill.Skill;
 import dk.muj.derius.util.BlockUtil;
+import dk.muj.derius.util.ChatUtil;
 import dk.muj.derius.woodcutting.entity.MConf;
 
 public class Timber extends Ability
@@ -56,6 +59,9 @@ public class Timber extends Ability
 			Material.LOG, Material.LOG_2, Material.LEAVES, Material.LEAVES_2
 			);
 	
+	public final static Set<BlockFace> TIMBER_FACES = MUtil.set(
+            BlockFace.UP, BlockFace.EAST, BlockFace.WEST, BlockFace.NORTH, BlockFace.SOUTH);
+	
 	// -------------------------------------------- //
 	// SKILL & ID
 	// -------------------------------------------- //
@@ -77,18 +83,22 @@ public class Timber extends Ability
 	// -------------------------------------------- //
 
 	@Override
-	public Optional<Object> onActivate(MPlayer p, Object other)
+	public Optional<Object> onActivate(MPlayer p, Object block)
 	{
 		if( ! p.isPlayer()) return Optional.empty();
-		Block sourceBlock = (Block) other;
-		if (sourceBlock == null) return Optional.empty();
+		
+		if(!(block instanceof Block))
+			return Optional.empty();
+		
+		Block sourceBlock = (Block) block;
 		
 		// Tree handling
 		Set<Block> tree = tree(sourceBlock);
 		if (tree == null) return Optional.empty();
+		Bukkit.broadcastMessage("Yo! tree got!");
 		
 		int logs = logCounter(tree);
-		if (logs >= MConf.get().getLogSoftCap() + p.getLvl(getSkill()) / 10) return Optional.empty();
+		if (logs >= MConf.get().getLogSoftCap() + p.getLvl(getSkill()) / 10 || logs >= MConf.get().getLogHardCap()) return Optional.empty();
 		
 		tree.stream().forEach(Block::breakNaturally);
 		
@@ -96,34 +106,15 @@ public class Timber extends Ability
 		// Inform surrounding players?
 		if (MConf.get().getInformSurroundingPlayers())
 		{
-			informSurroundingPlayers();
+			informSurroundingPlayers(p);
 		}
+		
+		Bukkit.broadcastMessage("Yo! informed!");
 		
 		// Drop extra items
 		if (MConf.get().getDropExtraItems())
 		{
-			List<ItemStack> is = new ArrayList<ItemStack>();
-			// Planks
-			int numPlanks = logs / 10 + random();
-			is.add(new ItemStack(Material.WOOD, numPlanks));
-			
-			// Sticks
-			int numSticks = logs / 20 + random();
-			is.add(new ItemStack(Material.STICK, numSticks));
-			
-			// Apples
-			int numApples = logs / 50 + random();
-			is.add(new ItemStack(Material.APPLE, numApples));
-			
-			// Saplings
-			int numSaplings = logs / 50 + random();
-			is.add(new ItemStack(Material.SAPLING, numSaplings));
-			
-			for (ItemStack itemStack : is)
-			{
-				sourceBlock.getWorld().dropItem(sourceBlock.getLocation(), itemStack);
-			}
-			
+			dropExtraItems(logs, sourceBlock);
 		}
 		
 		// Horribly unnecessary lore added, makes the player feel good
@@ -155,27 +146,31 @@ public class Timber extends Ability
 	// -------------------------------------------- //
 	// PRIVATE
 	// -------------------------------------------- //
-	
-	private Set<Block> tree(Block source)
-	{
-		Set<Block> ret = new HashSet<Block>();
-		ret.add(source);
-		
-		Mutable<Boolean> someLeft = new Mutable<Boolean>(true);
-		
-		while (someLeft.get())
-		{
-			someLeft.set(false);
-			ret.stream().forEach( (Block block) -> 
-			{
-			if (ret.addAll(BlockUtil.getSurroundingBlocksWith(block, 
-							MUtil.list(BlockFace.UP, BlockFace.EAST, BlockFace.WEST, BlockFace.NORTH, BlockFace.SOUTH))
-					.stream().filter(TIMBER_BLOCKS::contains).collect(Collectors.toList()))) someLeft.set(true);
-			});
-		}
-		
-		return ret;
-	}
+    public static Set<Block> tree(final Block source)
+    {
+        Set<Block> ret = new HashSet<>();
+        ret.add(source);
+        
+        // int data = source.getData();
+        
+        Mutable<Boolean> someLeft = new Mutable<>(true);
+        
+        while(someLeft.get())
+        {
+            someLeft.set(false);
+            Set<Block> add = new HashSet<Block>();
+            ret.stream().forEach( (Block block) -> 
+            add.addAll(BlockUtil.getSurroundingBlocksWith(block, TIMBER_FACES)
+                    .stream()
+                    .filter(b -> TIMBER_BLOCKS.contains(b.getType()))
+                    .collect(Collectors.toList()))
+            );
+            
+            if (ret.addAll(add)) someLeft.set(true);
+        }
+        
+        return ret;
+    }
 	
 	private int logCounter(Collection<Block> tree)
 	{
@@ -190,15 +185,55 @@ public class Timber extends Ability
 		return logCounter;
 	}
 	
-	private int random()
+	private void informSurroundingPlayers(MPlayer mplayer)
 	{
-		return (int)((Math.random()*10 + 1));
+		@SuppressWarnings("unchecked")
+		List<Player> players = (List<Player>) MUtil.getOnlinePlayers();
+		PS ps1 = PS.valueOf(mplayer.getPlayer().getLocation());
+		
+		for (Player p : players)
+		{
+			PS ps2 = PS.valueOf(p.getLocation());
+			
+			double distance = PS.locationDistance(ps1, ps2);
+			if (distance >= MConf.get().getTimberDistance()) continue;
+			
+			ChatUtil.sendTitle(p, Txt.parse("<i>TIMBER!"), 20, 60, 20);
+		}
+		
+	}
+
+	private void dropExtraItems(int logs, Block dropBlock)
+	{
+		List<ItemStack> is = new ArrayList<ItemStack>();
+		int num = logs * 100;
+		
+		// Planks
+		int numPlanks =  random((double) (num / MConf.get().getChancePerPlanks()));
+		is.add(new ItemStack(Material.WOOD, numPlanks));
+		
+		// Sticks
+		int numSticks = random((double) (num / MConf.get().getChancePerSticks()));
+		is.add(new ItemStack(Material.STICK, numSticks));
+		
+		// Apples
+		int numApples = random((double) (num / MConf.get().getChancePerApples()));
+		is.add(new ItemStack(Material.APPLE, numApples));
+		
+		// Saplings
+		int numSaplings = random( (double) (num / MConf.get().getChancePerSaplings()));
+		is.add(new ItemStack(Material.SAPLING, numSaplings));
+		
+		for (ItemStack itemStack : is)
+		{
+			dropBlock.getWorld().dropItem(dropBlock.getLocation(), itemStack);
+		}
 	}
 	
-	private void informSurroundingPlayers()
+
+	private int random(double chance)
 	{
-		// TODO Auto-generated method stub
-		
+		return (int)((Math.random() * (chance + MConf.get().getRandomModifier())));
 	}
 	
 	// -------------------------------------------- //
