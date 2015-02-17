@@ -8,14 +8,13 @@ import org.bukkit.inventory.ItemStack;
 
 import com.massivecraft.massivecore.util.MUtil;
 
-import dk.muj.derius.ability.Ability;
-import dk.muj.derius.ability.AbilityType;
-import dk.muj.derius.entity.MPlayer;
-import dk.muj.derius.skill.Skill;
+import dk.muj.derius.api.Ability;
+import dk.muj.derius.api.DPlayer;
+import dk.muj.derius.api.Skill;
+import dk.muj.derius.entity.ability.DeriusAbility;
 import dk.muj.derius.util.SkillUtil;
-import dk.muj.derius.woodcutting.entity.MConf;
 
-public class DoubleDrop extends Ability
+public class DoubleDrop extends DeriusAbility implements Ability
 {
 	private static DoubleDrop i = new DoubleDrop();
 	public static DoubleDrop get() { return i; }
@@ -28,7 +27,7 @@ public class DoubleDrop extends Ability
 	{
 		this.setName("Doubledrop");
 		
-		this.setDescription("gives doubledrop");
+		this.setDesc("gives doubledrop");
 		
 		this.setType(AbilityType.PASSIVE);
 	}
@@ -38,9 +37,9 @@ public class DoubleDrop extends Ability
 	// -------------------------------------------- //
 	
 	@Override
-	public int getId()
+	public String getId()
 	{
-		return MConf.get().getDoubleDropId();
+		return "derius:woodcutting:doubledrop";
 	}
 	
 	@Override
@@ -54,28 +53,24 @@ public class DoubleDrop extends Ability
 	// -------------------------------------------- //
 	
 	@Override
-	public Optional<Object> onActivate(MPlayer mplayer, Object block)
+	public Object onActivate(DPlayer dplayer, Object other)
 	{
-		if(!(block instanceof Block))
-			return Optional.empty();
-		if(!mplayer.isPlayer())
+		if ( ! (other instanceof Block))
 			return Optional.empty();
 		
-		Skill skill = getSkill();
-		
-		Block b = (Block) block;
+		Block b = (Block) other;
 		
 		@SuppressWarnings("deprecation")
 		int logId = b.getTypeId();
-		ItemStack inHand = mplayer.getPlayer().getItemInHand();
+		ItemStack inHand = dplayer.getPlayer().getItemInHand();
 		Location loc = b.getLocation();
 		
-		if(!MUtil.isAxe(inHand))
+		if ( ! MUtil.isAxe(inHand))
 			return Optional.empty();
 		
-		if(MConf.get().expGain.containsKey(logId) && SkillUtil.shouldPlayerGetDoubleDrop(mplayer, skill, 10))
+		if (WoodcuttingSkill.getExpGain().containsKey(logId) && SkillUtil.shouldDoubleDropOccur(dplayer.getLvl(getSkill()), 10))
 		{
-			for(ItemStack is: b.getDrops(inHand))
+			for (ItemStack is : b.getDrops(inHand))
 				b.getWorld().dropItem(loc, is);
 		}
 		
@@ -83,7 +78,7 @@ public class DoubleDrop extends Ability
 	}
 
 	@Override
-	public void onDeactivate(MPlayer p, Optional<Object> other)
+	public void onDeactivate(DPlayer dplayer, Object other)
 	{
 		// There is nothing to deactivate, a passive ability gets only activated once on runtime
 	}
@@ -93,8 +88,9 @@ public class DoubleDrop extends Ability
 	// -------------------------------------------- //
 	
 	@Override
-	public String getLvlDescription(int lvl)
+	public String getLvlDescriptionMsg(int lvl)
 	{
 		return "chance to double drop " + lvl/10.0 + "%";
 	}
+	
 }

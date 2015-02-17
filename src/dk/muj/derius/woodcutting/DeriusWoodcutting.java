@@ -2,8 +2,6 @@ package dk.muj.derius.woodcutting;
 
 import com.massivecraft.massivecore.MassivePlugin;
 
-import dk.muj.derius.woodcutting.entity.MConfColl;
-
 public class DeriusWoodcutting extends MassivePlugin
 {
 	// -------------------------------------------- //
@@ -22,8 +20,6 @@ public class DeriusWoodcutting extends MassivePlugin
 	public void onEnable()
 	{
 		super.preEnable();
-	
-		MConfColl.get().init();
 			
 		WoodcuttingSkill.get().register();
 		Timber.get().register();
