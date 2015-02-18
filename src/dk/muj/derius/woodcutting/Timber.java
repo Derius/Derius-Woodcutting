@@ -24,7 +24,6 @@ import dk.muj.derius.entity.MPlayer;
 import dk.muj.derius.entity.ability.DeriusAbility;
 import dk.muj.derius.lib.ItemUtil;
 import dk.muj.derius.req.ReqIsAtleastLevel;
-import dk.muj.derius.woodcutting.entity.MConf;
 
 public class Timber extends DeriusAbility implements Ability
 {	
@@ -45,7 +44,7 @@ public class Timber extends DeriusAbility implements Ability
 		
 		this.setType(AbilityType.ACTIVE);
 		
-		this.addActivateRequirements(ReqIsAtleastLevel.get(MConf.get().getTimberMinLvl()));
+		this.addActivateRequirements(ReqIsAtleastLevel.get(WoodcuttingSkill.getTimberMinLvl()));
 		
 	}
 	
@@ -97,17 +96,22 @@ public class Timber extends DeriusAbility implements Ability
 		// Logs + leaves check
 		int logs = logCounter(tree);
 		int leaves = leaveCounter(tree);
+		
+		// Debug message
 		dplayer.msg(Txt.parse("You just wanted cut down %s logs and %s leaves.", logs, leaves));
-		if (logs >= MConf.get().getLogSoftCap() + dplayer.getLvl(getSkill()) / 10 || logs >= MConf.get().getLogHardCap()) 
+		
+		if (logs >= WoodcuttingSkill.getLogSoftCap() + dplayer.getLvl(getSkill()) / 10 || logs >= WoodcuttingSkill.getLogHardCap()) 
 		{
 			dplayer.sendMessage(Txt.parse("<b>You are not strong enough to cut down this tree."));
 			return Optional.empty();
 		}
-		else if (leaves >= MConf.get().getLeaveSoftCap() + dplayer.getLvl(getSkill()) / 10 || leaves >= MConf.get().getLeaveHardCap()) 
+		else if (leaves >= WoodcuttingSkill.getLeaveSoftCap() + dplayer.getLvl(getSkill()) / 10 || leaves >= WoodcuttingSkill.getLeaveHardCap()) 
 		{
 			dplayer.sendMessage(Txt.parse("<b>You are not strong enough to cut down this tree."));
 			return Optional.empty();
 		}
+		
+		// Debug message
 		dplayer.msg(Txt.parse("You just have cut down %s logs and %s leaves.", logs, leaves));
 		
 		// Cut down the tree
@@ -117,13 +121,13 @@ public class Timber extends DeriusAbility implements Ability
 		applyDamageToTool(dplayer, logs);
 		
 		// Inform surrounding players
-		if (MConf.get().getInformSurroundingPlayers())
+		if (WoodcuttingSkill.getInformSurroundingPlayers())
 		{
 			informSurroundingPlayers(dplayer);
 		}
 		
 		// Drop extra items
-		if (MConf.get().getDropExtraItems())
+		if (WoodcuttingSkill.getDropExtraItems())
 		{
 			dropExtraItems(logs, sourceBlock.getLocation());
 		}
@@ -177,7 +181,7 @@ public class Timber extends DeriusAbility implements Ability
 			double health = player.getHealth();
 			if (health <= 1) return;
 			
-			player.damage(Math.random() * MConf.get().getSplinterDamageMultiplicator());
+			player.damage(Math.random() * WoodcuttingSkill.getSplinterDamageMultiplicator());
 		}
 	}
 	
@@ -194,7 +198,7 @@ public class Timber extends DeriusAbility implements Ability
 			PS ps2 = PS.valueOf(p.getLocation());
 			
 			double distance = PS.locationDistance(ps1, ps2);
-			if (distance >= MConf.get().getTimberDistance()) continue;
+			if (distance >= WoodcuttingSkill.getTimberDistance()) continue;
 			
 			TitleUtil.sendTitle(p, 20, 60, 20, Txt.parse("<i>TIMBER!"), "");
 		}
@@ -206,15 +210,15 @@ public class Timber extends DeriusAbility implements Ability
 		int num = logs / 100;
 		
 		// Planks
-		int numPlanks =  (int) (Math.random() * num * MConf.get().getChancePerPlanks());
+		int numPlanks =  (int) (Math.random() * num * WoodcuttingSkill.getChancePerPlank());
 		drop(loc, Material.WOOD, numPlanks = oneZero(numPlanks));
 		
 		// Sticks
-		int numSticks = (int) (Math.random() * num * MConf.get().getChancePerSticks());
+		int numSticks = (int) (Math.random() * num * WoodcuttingSkill.getChancePerSticks());
 		drop(loc, Material.WOOD, numSticks = oneZero(numSticks));
 		
 		// Apples
-		int numApples = (int) (Math.random() * num * MConf.get().getChancePerApples());
+		int numApples = (int) (Math.random() * num * WoodcuttingSkill.getChancePerApples());
 		drop(loc, Material.WOOD, numApples = oneZero(numApples));
 		
 	}

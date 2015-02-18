@@ -7,7 +7,6 @@ import com.massivecraft.massivecore.util.MUtil;
 import dk.muj.derius.api.DPlayer;
 import dk.muj.derius.util.AbilityUtil;
 import dk.muj.derius.util.Listener;
-import dk.muj.derius.woodcutting.entity.MConf;
 
 public class WoodcuttingListener implements Listener
 {
@@ -30,8 +29,7 @@ public class WoodcuttingListener implements Listener
 			AbilityUtil.activateAbility(dplayer, Timber.get(), block.getBlock(), false);
 		}
 		
-		@SuppressWarnings("deprecation")
-		Integer exp = MConf.get().expGain.get(block.getTypeId());
+		Integer exp = WoodcuttingSkill.getExpGain().get(block.getType());
 		if ( exp != null)
 		{
 			dplayer.addExp(WoodcuttingSkill.get(), exp);
