@@ -19,12 +19,13 @@ public class DeriusWoodcutting extends MassivePlugin
 	@Override
 	public void onEnable()
 	{
-		super.preEnable();
+		if ( ! super.preEnable()) return;
 			
 		WoodcuttingSkill.get().register();
 		Timber.get().register();
 		DoubleDrop.get().register();
-		new WoodcuttingListener();
+		
+		WoodcuttingListener.get();
 		
 		super.postEnable();
 	}

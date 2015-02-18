@@ -2,7 +2,6 @@ package dk.muj.derius.woodcutting;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 import org.bukkit.Location;
@@ -82,20 +81,17 @@ public class Timber extends DeriusAbility implements Ability
 	@Override
 	public Object onActivate(DPlayer dplayer, Object other)
 	{
-		if( ! (other instanceof Block))
-		{
-			return Optional.empty();
-		}
+		if( ! (other instanceof Block)) return null;
 		
 		Block sourceBlock = (Block) other;
 		
 		// Tree handling
 		Set<Block> tree = TreeUtil.tree(sourceBlock, 3);
-		if (tree == null) return Optional.empty();
+		if (tree == null) return null;
 		
 		// Logs + leaves check
-		int logs = logCounter(tree);
-		int leaves = leaveCounter(tree);
+		int logs = counter(tree, Material.LOG, Material.LOG_2);
+		int leaves = counter(tree, Material.LEAVES, Material.LEAVES_2);
 		
 		// Debug message
 		dplayer.msg(Txt.parse("You just wanted cut down %s logs and %s leaves.", logs, leaves));
@@ -103,12 +99,12 @@ public class Timber extends DeriusAbility implements Ability
 		if (logs >= WoodcuttingSkill.getLogSoftCap() + dplayer.getLvl(getSkill()) / 10 || logs >= WoodcuttingSkill.getLogHardCap()) 
 		{
 			dplayer.sendMessage(Txt.parse("<b>You are not strong enough to cut down this tree."));
-			return Optional.empty();
+			return null;
 		}
 		else if (leaves >= WoodcuttingSkill.getLeaveSoftCap() + dplayer.getLvl(getSkill()) / 10 || leaves >= WoodcuttingSkill.getLeaveHardCap()) 
 		{
 			dplayer.sendMessage(Txt.parse("<b>You are not strong enough to cut down this tree."));
-			return Optional.empty();
+			return null;
 		}
 		
 		// Debug message
@@ -132,7 +128,7 @@ public class Timber extends DeriusAbility implements Ability
 			dropExtraItems(logs, sourceBlock.getLocation());
 		}
 		
-		return Optional.empty();
+		return null;
 	}
 
 	@Override
@@ -145,31 +141,17 @@ public class Timber extends DeriusAbility implements Ability
 	// PRIVATE
 	// -------------------------------------------- //
 	
-	private int logCounter(Collection<Block> tree)
+	private int counter(Collection<Block> tree, Material... materials)
 	{
-		int logCounter = 0;
-		for (Block bs : tree)
+		int counter = 0;
+		for (Block block : tree)
 		{
-			if (bs.getType() == Material.LOG || bs.getType() == Material.LOG_2)
+			for (Material material : materials)
 			{
-				logCounter++;
+				if (block.getType() == material) counter++;
 			}
 		}
-		return logCounter;
-	}
-	
-	// I am lazy, create code two times
-	private int  leaveCounter(Collection<Block> tree)
-	{
-		int leaveCounter = 0;
-		for (Block bs : tree)
-		{
-			if (bs.getType() == Material.LEAVES || bs.getType() == Material.LEAVES_2)
-			{
-				leaveCounter++;
-			}
-		}
-		return leaveCounter;
+		return counter;
 	}
 	
 

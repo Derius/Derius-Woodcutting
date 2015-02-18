@@ -9,7 +9,6 @@ import com.massivecraft.massivecore.xlib.gson.reflect.TypeToken;
 
 import dk.muj.derius.api.Skill;
 import dk.muj.derius.entity.skill.DeriusSkill;
-import dk.muj.derius.util.Listener;
 
 public class WoodcuttingSkill extends DeriusSkill implements Skill
 {
@@ -22,7 +21,7 @@ public class WoodcuttingSkill extends DeriusSkill implements Skill
 	
 	public WoodcuttingSkill()
 	{
-		// 
+		// Skill properties 
 		this.setName("Woodcutting");
 		
 		this.setDesc("Makes you better at woodcutting.");
@@ -31,10 +30,7 @@ public class WoodcuttingSkill extends DeriusSkill implements Skill
 		
 		this.setIcon(Material.LOG);
 		
-		Listener.registerBlockBreakKeys(WoodcuttingListener.get(), WoodcuttingSkill.getExpGain().keySet());
-		Listener.registerTools(MUtil.AXE_MATERIALS);
-		
-		
+		// Config
 		this.writeConfig("timberMinLvl", 0);
 		this.writeConfig("logSoftCap", 10);
 		this.writeConfig("logHardCap", 50);
@@ -61,7 +57,7 @@ public class WoodcuttingSkill extends DeriusSkill implements Skill
 	}
 	
 	// -------------------------------------------- //
-	// CONFIG
+	// CONFIG GETTERS
 	// -------------------------------------------- //
 	
 	public static Map<Material, Integer> getExpGain()
@@ -129,4 +125,5 @@ public class WoodcuttingSkill extends DeriusSkill implements Skill
 	{
 		return get().readConfig("splinterDamageMultiplicator", double.class);
 	}
+	
 }

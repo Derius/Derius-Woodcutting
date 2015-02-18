@@ -1,7 +1,5 @@
 package dk.muj.derius.woodcutting;
 
-import java.util.Optional;
-
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.inventory.ItemStack;
@@ -55,26 +53,23 @@ public class DoubleDrop extends DeriusAbility implements Ability
 	@Override
 	public Object onActivate(DPlayer dplayer, Object other)
 	{
-		if ( ! (other instanceof Block))
-			return Optional.empty();
-		
+		if ( ! (other instanceof Block)) return null;
 		Block b = (Block) other;
 		
-		@SuppressWarnings("deprecation")
-		int logId = b.getTypeId();
 		ItemStack inHand = dplayer.getPlayer().getItemInHand();
 		Location loc = b.getLocation();
 		
-		if ( ! MUtil.isAxe(inHand))
-			return Optional.empty();
+		if ( ! MUtil.isAxe(inHand)) return null;
 		
-		if (WoodcuttingSkill.getExpGain().containsKey(logId) && SkillUtil.shouldDoubleDropOccur(dplayer.getLvl(getSkill()), 10))
+		if (WoodcuttingSkill.getExpGain().containsKey(b.getType()) && SkillUtil.shouldDoubleDropOccur(dplayer.getLvl(getSkill()), 10))
 		{
 			for (ItemStack is : b.getDrops(inHand))
+			{
 				b.getWorld().dropItem(loc, is);
+			}
 		}
 		
-		return Optional.empty();
+		return null;
 	}
 
 	@Override
