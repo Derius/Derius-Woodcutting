@@ -18,8 +18,8 @@ import com.massivecraft.massivecore.util.Txt;
 
 import dk.muj.derius.api.Ability;
 import dk.muj.derius.api.DPlayer;
+import dk.muj.derius.api.DeriusAPI;
 import dk.muj.derius.api.Skill;
-import dk.muj.derius.entity.MPlayer;
 import dk.muj.derius.entity.ability.DeriusAbility;
 import dk.muj.derius.lib.ItemUtil;
 import dk.muj.derius.req.ReqIsAtleastLevel;
@@ -175,7 +175,7 @@ public class Timber extends DeriusAbility implements Ability
 		
 		for (Player p : players)
 		{
-			if (MPlayer.get(p.getUniqueId()) == dplayer) return;
+			if (DeriusAPI.getDPlayer(p) == dplayer) return;
 			
 			PS ps2 = PS.valueOf(p.getLocation());
 			

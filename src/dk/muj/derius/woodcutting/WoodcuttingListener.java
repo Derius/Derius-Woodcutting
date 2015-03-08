@@ -4,8 +4,9 @@ import org.bukkit.block.BlockState;
 
 import com.massivecraft.massivecore.util.MUtil;
 
-import dk.muj.derius.DeriusCore;
 import dk.muj.derius.api.DPlayer;
+import dk.muj.derius.api.DeriusAPI;
+import dk.muj.derius.api.VerboseLevel;
 import dk.muj.derius.util.AbilityUtil;
 import dk.muj.derius.util.Listener;
 
@@ -23,7 +24,7 @@ public class WoodcuttingListener implements Listener
 		i = this;
 		Listener.registerBlockBreakKeys(this, WoodcuttingSkill.getExpGain().keySet());
 		Listener.registerTools(MUtil.AXE_MATERIALS);
-		DeriusCore.getBlockMixin().addBlockTypesToListenFor(WoodcuttingSkill.getExpGain().keySet());
+		DeriusAPI.getBlockMixin().addBlockTypesToListenFor(WoodcuttingSkill.getExpGain().keySet());
 	}
 	
 	// -------------------------------------------- //
@@ -37,7 +38,7 @@ public class WoodcuttingListener implements Listener
 		
 		if (MUtil.AXE_MATERIALS.contains(dplayer.getPreparedTool().get()))
 		{
-			AbilityUtil.activateAbility(dplayer, Timber.get(), block.getBlock(), false);
+			AbilityUtil.activateAbility(dplayer, Timber.get(), block.getBlock(), VerboseLevel.ALWAYS);
 		}
 		
 		Integer exp = WoodcuttingSkill.getExpGain().get(block.getType());
@@ -46,6 +47,6 @@ public class WoodcuttingListener implements Listener
 			dplayer.addExp(WoodcuttingSkill.get(), exp);
 		}
 		
-		AbilityUtil.activateAbility(dplayer, DoubleDrop.get(), block, false);
+		AbilityUtil.activateAbility(dplayer, DoubleDrop.get(), block, VerboseLevel.NEVER);
 	}
 }
