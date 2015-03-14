@@ -1,6 +1,10 @@
 package dk.muj.derius.woodcutting;
 
 import com.massivecraft.massivecore.MassivePlugin;
+import com.massivecraft.massivecore.util.MUtil;
+
+import dk.muj.derius.api.DeriusAPI;
+import dk.muj.derius.util.Listener;
 
 public class DeriusWoodcutting extends MassivePlugin
 {
@@ -19,14 +23,19 @@ public class DeriusWoodcutting extends MassivePlugin
 	@Override
 	public void onEnable()
 	{
-		if ( ! super.preEnable()) return;
+		if ( ! this.preEnable()) return;
 			
 		WoodcuttingSkill.get().register();
 		Timber.get().register();
 		DoubleDrop.get().register();
+
+		EngineWoodcutting.get().activate();
 		
-		WoodcuttingListener.get();
+		Listener.registerTools(MUtil.AXE_MATERIALS);
+		DeriusAPI.addBlockTypesToListenFor(WoodcuttingSkill.getExpGain().keySet());
+		DeriusAPI.addBlockTypesToListenFor(WoodcuttingSkill.getDoubleDropBlocks());
 		
-		super.postEnable();
+		this.postEnable();
 	}
+	
 }

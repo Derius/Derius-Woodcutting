@@ -1,62 +1,67 @@
 package dk.muj.derius.woodcutting;
 
 import java.util.Collection;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
-import org.bukkit.Location;
+import org.apache.commons.lang.mutable.MutableBoolean;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.BlockState;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import com.massivecraft.massivecore.mixin.Mixin;
 import com.massivecraft.massivecore.ps.PS;
+import com.massivecraft.massivecore.util.IntervalUtil;
 import com.massivecraft.massivecore.util.MUtil;
-import com.massivecraft.massivecore.util.TitleUtil;
-import com.massivecraft.massivecore.util.Txt;
+import com.massivecraft.massivecore.util.TimeUnit;
 
-import dk.muj.derius.api.Ability;
-import dk.muj.derius.api.DPlayer;
-import dk.muj.derius.api.DeriusAPI;
-import dk.muj.derius.api.Skill;
-import dk.muj.derius.entity.ability.DeriusAbility;
+import dk.muj.derius.api.ability.AbilityAbstract;
+import dk.muj.derius.api.player.DPlayer;
+import dk.muj.derius.api.req.ReqIsAtleastLevel;
+import dk.muj.derius.api.req.ReqIsntExhausted;
+import dk.muj.derius.api.skill.Skill;
+import dk.muj.derius.api.util.AbilityUtil;
+import dk.muj.derius.lib.BlockUtil;
 import dk.muj.derius.lib.ItemUtil;
-import dk.muj.derius.req.ReqIsAtleastLevel;
 
-public class Timber extends DeriusAbility implements Ability
+public class Timber extends AbilityAbstract
 {	
+	// -------------------------------------------- //
+	// INSTANCE & CONSTRUCT
+	// -------------------------------------------- //
+	
 	private static Timber i = new Timber();
 	public static Timber get() { return i; }
-	
-	// -------------------------------------------- //
-	// DESCRIPTION
-	// -------------------------------------------- //
-	
+
 	public Timber()
 	{
 		this.setName("Timber");
 		
 		this.setDesc("Harvests a full tree.");
 		
-		this.setTicksCooldown(5); // normally at 2*60*20
+		this.setCooldownMillis((int) (5*TimeUnit.MILLIS_PER_SECOND)); // normally at 2*60*20
 		
-		this.setType(AbilityType.ACTIVE);
+		this.setType(AbilityType.PASSIVE);
 		
-		this.addActivateRequirements(ReqIsAtleastLevel.get(WoodcuttingSkill.getTimberMinLvl()));
-		
+		this.addActivateRequirements(ReqIsAtleastLevel.get( () -> WoodcuttingSkill.getTimberMinLvl() ));
+		this.addActivateRequirements(ReqIsntExhausted.get());
 	}
 	
 	// -------------------------------------------- //
 	// STATIC
 	// -------------------------------------------- //
-	
-	public final static Set<Material> TIMBER_BLOCKS = MUtil.set(
-			Material.LOG, Material.LOG_2, Material.LEAVES, Material.LEAVES_2
-			);
-	
+
 	public final static Set<BlockFace> TIMBER_FACES = MUtil.set(
-            BlockFace.UP, BlockFace.DOWN, BlockFace.EAST, BlockFace.WEST, BlockFace.NORTH, BlockFace.SOUTH);
+            BlockFace.UP,
+            BlockFace.EAST,
+            BlockFace.WEST,
+            BlockFace.NORTH,
+            BlockFace.SOUTH);
 	
 	// -------------------------------------------- //
 	// SKILL & ID
@@ -75,157 +80,227 @@ public class Timber extends DeriusAbility implements Ability
 	}
 
 	// -------------------------------------------- //
-	// ABILITY ACTIVATION
+	// OVERRIDE
 	// -------------------------------------------- //
 
 	@Override
 	public Object onActivate(DPlayer dplayer, Object other)
 	{
-		if( ! (other instanceof Block)) return null;
-		
 		Block sourceBlock = (Block) other;
+		BlockState originalState = sourceBlock.getState();
 		
 		// Tree handling
-		Set<Block> tree = TreeUtil.tree(sourceBlock, 3);
-		if (tree == null) return null;
+		Set<Block> tree = getTree(sourceBlock);
+		if (tree == null || tree.isEmpty()) return AbilityUtil.CANCEL;
 		
 		// Logs + leaves check
-		int logs = counter(tree, Material.LOG, Material.LOG_2);
-		int leaves = counter(tree, Material.LEAVES, Material.LEAVES_2);
+		int logs = count(tree, Material.LOG, Material.LOG_2);
+		int leaves = count(tree, Material.LEAVES, Material.LEAVES_2);
 		
 		// Debug message
-		dplayer.msg(Txt.parse("You just wanted cut down %s logs and %s leaves.", logs, leaves));
-		
-		if (logs >= WoodcuttingSkill.getLogSoftCap() + dplayer.getLvl(getSkill()) / 10 || logs >= WoodcuttingSkill.getLogHardCap()) 
-		{
-			dplayer.sendMessage(Txt.parse("<b>You are not strong enough to cut down this tree."));
-			return null;
-		}
-		else if (leaves >= WoodcuttingSkill.getLeaveSoftCap() + dplayer.getLvl(getSkill()) / 10 || leaves >= WoodcuttingSkill.getLeaveHardCap()) 
-		{
-			dplayer.sendMessage(Txt.parse("<b>You are not strong enough to cut down this tree."));
-			return null;
-		}
-		
+		//dplayer.msg(Txt.parse("You just wanted cut down %s logs and %s leaves.", logs, leaves));
+
 		// Debug message
-		dplayer.msg(Txt.parse("You just have cut down %s logs and %s leaves.", logs, leaves));
+		//dplayer.msg(Txt.parse("You just have cut down %s logs and %s leaves.", logs, leaves));
 		
 		// Cut down the tree
-		tree.stream().forEach(Block::breakNaturally);
+		tree.forEach(Block::breakNaturally);
 		
 		// Take away some damage of the item in hand
 		applyDamageToTool(dplayer, logs);
 		
 		// Inform surrounding players
-		if (WoodcuttingSkill.getInformSurroundingPlayers())
-		{
-			informSurroundingPlayers(dplayer);
-		}
+		informSurroundingPlayers(dplayer);
 		
 		// Drop extra items
-		if (WoodcuttingSkill.getDropExtraItems())
+		if (WoodcuttingSkill.shouldDropExtraItems())
 		{
-			dropExtraItems(logs, sourceBlock.getLocation());
+			dropExtraItems(logs, leaves, originalState);
 		}
 		
 		return null;
 	}
 
+	@Override public void onDeactivate(DPlayer dplayer, Object other) { }
+	
 	@Override
-	public void onDeactivate(DPlayer dplayer, Object other)
+	public Optional<String> getLvlDescriptionMsg(int level)
 	{
-		// Do nothing
+		return Optional.empty();
 	}
 	
 	// -------------------------------------------- //
+	// GET TREE
+	// -------------------------------------------- //
+   
+	public static Set<Block> getTree(final Block source)
+	{
+		// We create a return...
+		Set<Block> ret = new HashSet<>();
+		// ... which initially contains the source block.
+		ret.add(source);
+		
+		// We calculate the maximum radius dependent on the wood type.
+		final int radius = getRadius(source);
+		
+		// This boolean determines if we should look any further.
+		// it is set to false if an operation doesn't add anything to the return value.
+		MutableBoolean someLeft = new MutableBoolean(true);
+		
+		// The latest added blocks, we use this to prevent looking through
+		// the same blocks multiple times.
+		// Initially it is just the source block.
+		Set<Block> latest = ret;
+		  
+		while (someLeft.booleanValue())
+		{
+			// The blocks we are going to add next time we modify return.
+			Set<Block> add = new HashSet<Block>();
+			
+			// For all the latest added blocks, we look through
+			// the nearest ones to add to the three.
+			latest.forEach( (Block block) ->
+				add.addAll(BlockUtil.getSurroundingBlocksWith(block, TIMBER_FACES)
+							.stream()
+							// Of course it must be a log or leave.
+							.filter(BlockUtil::isLogOrLeave)
+							// The wood type must match the source.
+							.filter(b -> BlockUtil.isSameWoodType(source.getState(), b.getState()))
+							// And it may not be too far away.
+							.filter(b -> isLocationOk(source.getState(), b.getState(), radius))
+							.collect(Collectors.toSet()))
+			);
+			// So if true is returned, we modified the return...
+			// and there might still be wood to find.
+			someLeft.setValue(ret.addAll(add));
+			// The latest added blocks are the ones we just added.
+			latest = add;	
+		}
+		  
+		return ret;
+	}
+	
+	private static int getRadius(Block source)
+	{
+		BlockState state = source.getState();
+		if (BlockUtil.isOak(state)) return WoodcuttingSkill.getRadiusOak();
+		if (BlockUtil.isSpruce(state)) return WoodcuttingSkill.getRadiusSpruce();
+		if (BlockUtil.isBirch(state)) return WoodcuttingSkill.getRadiusBirch();
+		if (BlockUtil.isJungle(state)) return WoodcuttingSkill.getRadiusJungle();
+		if (BlockUtil.isAcacia(state)) return WoodcuttingSkill.getRadiusAcacia();
+		if (BlockUtil.isDarkOak(state)) return WoodcuttingSkill.getRadiusDarkOak();
+		
+		return 0;
+	}
+	
+	@SuppressWarnings("deprecation")
+	private static boolean isLocationOk(BlockState source, BlockState compared, int radius)
+	{
+		// If it is a log and it is facing up/down...
+		if (BlockUtil.isLog(compared) && compared.getData().getData() < 4)
+		{
+			// ... it's radius must be 0...
+			radius = 0;
+			// .. unless it is jungle then it is 1
+			if (BlockUtil.isJungle(source))
+			{
+				radius = 1;
+			}
+		}
+		
+		// If distance on x-axis is too much, location isn't ok.
+		if (Math.abs(source.getX()-compared.getX()) > radius) return false;
+		
+		// If distance on z-axis is too much, location isn't ok.
+		if (Math.abs(source.getZ()-compared.getZ()) > radius) return false;
+		
+		// It passed all the checks.
+		return true;
+	}
+   
+
+	// -------------------------------------------- //
 	// PRIVATE
 	// -------------------------------------------- //
-	
-	private int counter(Collection<Block> tree, Material... materials)
+
+	private int count(Collection<Block> tree, Material... materials)
 	{
-		int counter = 0;
+		int ret = 0;
 		for (Block block : tree)
 		{
 			for (Material material : materials)
 			{
-				if (block.getType() == material) counter++;
+				if (block.getType() == material) ret++;
 			}
 		}
-		return counter;
+		return ret;
 	}
 	
-
-	private void applyDamageToTool(DPlayer dplayer, int logs)
+	private void applyDamageToTool(DPlayer dplayer, double logs)
 	{
 		Player player = dplayer.getPlayer();
-		if (ItemUtil.applyDamage(player.getItemInHand(), (short)logs))
+		double damage = logs * WoodcuttingSkill.getTimberToolDamageMultiplier();
+		damage = MUtil.probabilityRound(damage);
+		if (ItemUtil.applyDamage(player.getItemInHand(), (short) damage))
 		{
-			double health = player.getHealth();
-			if (health <= 1) return;
-			
-			player.damage(Math.random() * WoodcuttingSkill.getSplinterDamageMultiplicator());
+			player.damage(IntervalUtil.random(WoodcuttingSkill.getSplinterDamageMin(), WoodcuttingSkill.getSplinterDamageMax()));
 		}
 	}
 	
 	private void informSurroundingPlayers(DPlayer dplayer)
 	{
-		@SuppressWarnings("unchecked")
-		List<Player> players = (List<Player>) MUtil.getOnlinePlayers();
-		PS ps1 = PS.valueOf(dplayer.getPlayer().getLocation());
+		if ( ! WoodcuttingSkill.shouldInformSurroundingPlayers()) return;
+		PS ps1 = Mixin.getSenderPs(dplayer);
 		
-		for (Player p : players)
+		for (Player player : MUtil.getOnlinePlayers())
 		{
-			if (DeriusAPI.getDPlayer(p) == dplayer) return;
+			PS ps2 = PS.valueOf(player.getLocation());
 			
-			PS ps2 = PS.valueOf(p.getLocation());
+			// We get the distance squared, because that is a much cheaper operation,
+			// than getting the distance. The latter calls Math.sgrt
+			double distance = PS.locationDistanceSquared(ps1, ps2);
+			// To make it match we must get the timberDistance squared
+			if (distance >= (WoodcuttingSkill.getTimberDistance()^2)) continue;
 			
-			double distance = PS.locationDistance(ps1, ps2);
-			if (distance >= WoodcuttingSkill.getTimberDistance()) continue;
-			
-			TitleUtil.sendTitle(p, 20, 60, 20, Txt.parse("<i>TIMBER!"), "");
+			Mixin.sendTitleMsg(player, 10, 40, 10, "<lime>TIMBER!", null);
 		}
 		
 	}
 
-	private void dropExtraItems(int logs, Location loc)
+	private void dropExtraItems(int logs, int leaves, BlockState source)
 	{
-		int num = logs / 100;
-		
 		// Planks
-		int numPlanks =  (int) (Math.random() * num * WoodcuttingSkill.getChancePerPlank());
-		drop(loc, Material.WOOD, numPlanks = oneZero(numPlanks));
+		double planksPerLog = IntervalUtil.random(WoodcuttingSkill.getSticksPerLogMin(), WoodcuttingSkill.getSticksPerLogMax());
+		int numPlanks = (int) MUtil.probabilityRound(logs * planksPerLog);
+		source.getWorld().dropItem(source.getLocation(), logToPlank(source, numPlanks));
 		
 		// Sticks
-		int numSticks = (int) (Math.random() * num * WoodcuttingSkill.getChancePerSticks());
-		drop(loc, Material.WOOD, numSticks = oneZero(numSticks));
+		double sticksPerLog = IntervalUtil.random(WoodcuttingSkill.getSticksPerLogMin(), WoodcuttingSkill.getSticksPerLogMax());
+		int numSticks = (int) MUtil.probabilityRound(logs * sticksPerLog);
+		source.getWorld().dropItem(source.getLocation(), new ItemStack(Material.STICK, numSticks));
 		
 		// Apples
-		int numApples = (int) (Math.random() * num * WoodcuttingSkill.getChancePerApples());
-		drop(loc, Material.WOOD, numApples = oneZero(numApples));
+		if (BlockUtil.isOak(source))
+		{
+			double applesPerLeave = IntervalUtil.random(WoodcuttingSkill.getApplesPerLeaveMin(), WoodcuttingSkill.getApplesPerLeaveMax());
+			int numApples = (int) (int) MUtil.probabilityRound(leaves * applesPerLeave);
+			source.getWorld().dropItem(source.getLocation(), new ItemStack(Material.APPLE, numApples));
+		}
 		
 	}
-	
-	private int oneZero(int num)
-	{
-		if (num == 1) return (int)Math.random();
-		return num;
-	}
-	
-	private void drop(Location loc, Material material, int amount)
-	{
-		if (amount == 0) return;
 
-		loc.getBlock().getWorld().dropItem(loc, new ItemStack(material, amount));
-	}
-    
-	// -------------------------------------------- //
-	// Level description
-	// -------------------------------------------- //
-	
-	@Override
-	public String getLvlDescriptionMsg(int lvl)
+	private ItemStack logToPlank(BlockState log, int num)
 	{
-		return "Lasts "+this.getDuration(lvl)/20 + " seconds";
+		ItemStack ret = new ItemStack(Material.WOOD, num);
+		
+		if (BlockUtil.isOak(log)) ret.setDurability( (short) 0);
+		else if (BlockUtil.isSpruce(log)) ret.setDurability( (short) 1);
+		else if (BlockUtil.isBirch(log)) ret.setDurability( (short) 2);
+		else if (BlockUtil.isJungle(log)) ret.setDurability( (short) 3);
+		else if (BlockUtil.isAcacia(log)) ret.setDurability( (short) 4);
+		else if (BlockUtil.isDarkOak(log)) ret.setDurability( (short) 5);
+
+		return ret;
 	}
 
 }
