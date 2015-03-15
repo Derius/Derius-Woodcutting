@@ -5,7 +5,7 @@ import com.massivecraft.massivecore.util.MUtil;
 
 import dk.muj.derius.api.DeriusAPI;
 
-public class DeriusWoodcutting extends MassivePlugin
+public final class DeriusWoodcutting extends MassivePlugin
 {
 	// -------------------------------------------- //
 	// INSTANCE & CONSTRUCT
@@ -13,7 +13,7 @@ public class DeriusWoodcutting extends MassivePlugin
 	
 	private static DeriusWoodcutting i;
 	public static DeriusWoodcutting get() { return i; }
-	public DeriusWoodcutting() { i = this; }
+	private DeriusWoodcutting() { i = this; }
 	
 	// -------------------------------------------- //
 	// OVERRIDE

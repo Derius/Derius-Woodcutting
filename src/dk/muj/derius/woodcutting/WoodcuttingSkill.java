@@ -78,6 +78,11 @@ public class WoodcuttingSkill extends SkillAbstract
 				500, 1,
 				2000, 0),
 				 new TypeToken<Map<Integer, Double>>(){});
+		
+		this.writeConfig(Const.JSON_CAREFUL_CUTTING, MUtil.map(
+				0, 0.5,
+				1000, 1.5,
+				2000, 3.0), new TypeToken<Map<Integer, Double>>(){});
 	}
 	
 	// -------------------------------------------- //
@@ -110,6 +115,13 @@ public class WoodcuttingSkill extends SkillAbstract
 	{
 		return get().readConfig(Const.JSON_DOUBLE_DROP_BLOCKS, new TypeToken<Set<Material>>(){});
 	}
+	
+	
+	public static Map<Integer, Double> getDurabilityMultiplier()
+	{
+		return get().readConfig(Const.JSON_CAREFUL_CUTTING, new TypeToken<Map<Integer, Double>>(){});
+	}
+
 	
 	public static int getLevelsPerPercent()
 	{

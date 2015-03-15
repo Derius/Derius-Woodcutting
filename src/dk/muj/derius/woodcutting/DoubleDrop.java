@@ -9,7 +9,6 @@ import dk.muj.derius.api.skill.Skill;
 
 public class DoubleDrop extends AbilityDoubleDrop
 {
-	
 	// -------------------------------------------- //
 	// INSTANCE & CONSTRUCT
 	// -------------------------------------------- //

@@ -13,6 +13,7 @@ public class Const
 	// CONFIG
 	// -------------------------------------------- //
 	
+	public static final String JSON_CAREFUL_CUTTING = "Cutting durability mutiplier";
 	public static final String JSON_EXP_GAIN = "Exp gain";
 	public static final String JSON_DOUBLE_DROP_BLOCKS = "DoubleDrop blocks";
 	public static final String JSON_LEVELS_PER_PERCENT = "DoubleDrop levels per percent";
