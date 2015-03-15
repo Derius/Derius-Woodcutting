@@ -58,12 +58,6 @@ public class EngineWoodcutting extends EngineAbstract
 		{
 			AbilityUtil.activateAbility(dplayer, Timber.get(), block, VerboseLevel.NORMAL);
 		}
-		
-		Integer exp = WoodcuttingSkill.getExpGain().get(block.getType());
-		if ( exp != null)
-		{
-			dplayer.addExp(WoodcuttingSkill.get(), exp);
-		}
 	}
 	
 	@EventHandler(priority = EventPriority.HIGHEST)//, ignoreCancelled = true)
