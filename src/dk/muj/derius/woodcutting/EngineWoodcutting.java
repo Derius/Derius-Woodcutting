@@ -7,7 +7,9 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.plugin.Plugin;
 
 import com.massivecraft.massivecore.EngineAbstract;
@@ -62,6 +64,21 @@ public class EngineWoodcutting extends EngineAbstract
 		{
 			dplayer.addExp(WoodcuttingSkill.get(), exp);
 		}
+	}
+	
+	@EventHandler(priority = EventPriority.HIGHEST)//, ignoreCancelled = true)
+	public void activateLeafBlower(PlayerInteractEvent event)
+	{
+		if (event.getAction() != Action.LEFT_CLICK_BLOCK) return;
+		if ( ! event.hasItem()) return;
+		if ( ! MUtil.isAxe(event.getItem())) return;
+		
+		Block block = event.getClickedBlock();
+		if ( ! BlockUtil.isLeave(block)) return;
+		
+		DPlayer dplayer = DeriusAPI.getDPlayer(event.getPlayer());
+		
+		AbilityUtil.activateAbility(dplayer, LeafBlower.get(), block, VerboseLevel.HIGHEST);
 	}
 
 }

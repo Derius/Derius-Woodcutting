@@ -241,7 +241,7 @@ public class Timber extends AbilityAbstract
 		Player player = dplayer.getPlayer();
 		double damage = logs * WoodcuttingSkill.getTimberToolDamageMultiplier();
 		damage = MUtil.probabilityRound(damage);
-		if (ItemUtil.applyDamage(player.getItemInHand(), (short) damage))
+		if (ItemUtil.applyDamage(player.getItemInHand(), (short) damage).getSecond())
 		{
 			player.damage(IntervalUtil.random(WoodcuttingSkill.getSplinterDamageMin(), WoodcuttingSkill.getSplinterDamageMax()));
 		}

@@ -69,6 +69,15 @@ public class WoodcuttingSkill extends SkillAbstract
 		this.writeConfig(Const.JSON_RADIUS_ACACIA, 4);
 		this.writeConfig(Const.JSON_RADIUS_DARK_OAK, 3);
 		
+		
+		this.writeConfig(Const.JSON_LEAF_BLOWER_MIN_LVL, 0);
+		this.writeConfig(Const.JSON_LEAF_BLOWER_LEVEL_SETTINGS, MUtil.map(
+				0, 3,
+				100, 2.5,
+				200, 2,
+				500, 1,
+				2000, 0),
+				 new TypeToken<Map<Integer, Double>>(){});
 	}
 	
 	// -------------------------------------------- //
@@ -204,5 +213,17 @@ public class WoodcuttingSkill extends SkillAbstract
 	{
 		return get().readConfig(Const.JSON_RADIUS_DARK_OAK, int.class);
 	}
+	
+	
+	public static int getLeafBlowerMinLevel()
+	{
+		return get().readConfig(Const.JSON_LEAF_BLOWER_MIN_LVL, int.class);
+	}
 
+	
+	public static Map<Integer, Double> getLeafBlowerToolDamage()
+	{
+		return get().readConfig(Const.JSON_LEAF_BLOWER_LEVEL_SETTINGS, new TypeToken<Map<Integer, Double>>(){});
+	}
+	
 }

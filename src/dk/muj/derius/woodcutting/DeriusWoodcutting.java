@@ -27,7 +27,8 @@ public class DeriusWoodcutting extends MassivePlugin
 		WoodcuttingSkill.get().register();
 		Timber.get().register();
 		DoubleDrop.get().register();
-
+		LeafBlower.get().register();
+		
 		EngineWoodcutting.get().activate();
 		
 		DeriusAPI.registerPreparableTools(MUtil.AXE_MATERIALS);

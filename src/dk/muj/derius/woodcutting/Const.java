@@ -37,4 +37,7 @@ public class Const
 	public static final String JSON_SHOULD_DROP_EXTRA = "Timber extra drops";
 	public static final String JSON_TIMBER_MIN_LEVEL = "Timber min level";
 	
+	public static final String JSON_LEAF_BLOWER_MIN_LVL = "LeafBlower min level";
+	public static final String JSON_LEAF_BLOWER_LEVEL_SETTINGS = "LeafBlower tool damage";
+	
 }
