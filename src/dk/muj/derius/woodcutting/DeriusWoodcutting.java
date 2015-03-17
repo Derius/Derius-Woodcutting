@@ -13,7 +13,7 @@ public final class DeriusWoodcutting extends MassivePlugin
 	
 	private static DeriusWoodcutting i;
 	public static DeriusWoodcutting get() { return i; }
-	private DeriusWoodcutting() { i = this; }
+	public DeriusWoodcutting() { i = this; }
 	
 	// -------------------------------------------- //
 	// OVERRIDE
