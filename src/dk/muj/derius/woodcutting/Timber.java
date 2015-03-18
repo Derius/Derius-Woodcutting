@@ -118,7 +118,7 @@ public class Timber extends AbilityAbstract
 			dropExtraItems(logs, leaves, originalState);
 		}
 		
-		return null;
+		return tree;
 	}
 
 	@Override public void onDeactivate(DPlayer dplayer, Object other) { }
@@ -141,7 +141,7 @@ public class Timber extends AbilityAbstract
 		ret.add(source);
 		
 		// We calculate the maximum radius dependent on the wood type.
-		final int radius = getRadius(source);
+		final int radius = getRadius(source.getState());
 		
 		// This boolean determines if we should look any further.
 		// it is set to false if an operation doesn't add anything to the return value.
@@ -180,9 +180,8 @@ public class Timber extends AbilityAbstract
 		return ret;
 	}
 	
-	private static int getRadius(Block source)
+	private static int getRadius(BlockState state)
 	{
-		BlockState state = source.getState();
 		if (BlockUtil.isOak(state)) return WoodcuttingSkill.getRadiusOak();
 		if (BlockUtil.isSpruce(state)) return WoodcuttingSkill.getRadiusSpruce();
 		if (BlockUtil.isBirch(state)) return WoodcuttingSkill.getRadiusBirch();
