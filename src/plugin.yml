@@ -5,3 +5,4 @@ main: dk.muj.derius.woodcutting.DeriusWoodcutting
 authors: [Ulumulu1510, Madus]
 description: <e>Woodcutting skill for the Derius skill framework.
 depend: [Derius-Core]
+load: startup

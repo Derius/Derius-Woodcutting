@@ -7,6 +7,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang.mutable.MutableBoolean;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -15,6 +16,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import com.massivecraft.massivecore.mixin.Mixin;
+import com.massivecraft.massivecore.particleeffect.ParticleEffect;
+import com.massivecraft.massivecore.particleeffect.ParticleEffect.BlockData;
 import com.massivecraft.massivecore.ps.PS;
 import com.massivecraft.massivecore.util.IntervalUtil;
 import com.massivecraft.massivecore.util.MUtil;
@@ -103,6 +106,18 @@ public class Timber extends AbilityAbstract
 		// Debug message
 		//dplayer.msg(Txt.parse("You just have cut down %s logs and %s leaves.", logs, leaves));
 		
+		for (Block block : tree)
+		{
+			Location particleLoc = block.getLocation().add(0.5, 0.5, 0.5);
+			
+			ParticleEffect effect;
+			if (BlockUtil.isLog(block)) effect = ParticleEffect.CRIT;
+			else if (BlockUtil.isLeave(block)) effect = ParticleEffect.SLIME;
+			else continue;
+			
+			effect.display((float) 0.3, (float) 0.3, (float) 0.3, (float) 0.02, 30, particleLoc, 32);
+		}
+		
 		// Cut down the tree
 		tree.forEach(Block::breakNaturally);
 		
@@ -118,6 +133,10 @@ public class Timber extends AbilityAbstract
 			dropExtraItems(logs, leaves, originalState);
 		}
 		
+
+		dplayer.setPreparedTool(Optional.empty());
+		
+
 		return tree;
 	}
 
