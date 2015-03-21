@@ -4,6 +4,8 @@ import java.util.Collection;
 
 import org.bukkit.Material;
 
+import com.massivecraft.massivecore.util.MUtil;
+
 import dk.muj.derius.api.ability.AbilityDoubleDrop;
 import dk.muj.derius.api.skill.Skill;
 
@@ -44,9 +46,15 @@ public class DoubleDrop extends AbilityDoubleDrop
 	}
 
 	@Override
+	public Collection<Material> getToolTypes()
+	{
+		return MUtil.AXE_MATERIALS;
+	}
+	
+	@Override
 	public int getLevelsPerPercent()
 	{
 		return WoodcuttingSkill.getLevelsPerPercent();
 	}
-	
+
 }
