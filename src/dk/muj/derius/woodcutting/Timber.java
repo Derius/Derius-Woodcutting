@@ -18,6 +18,7 @@ import org.bukkit.inventory.ItemStack;
 import com.massivecraft.massivecore.mixin.Mixin;
 import com.massivecraft.massivecore.particleeffect.ParticleEffect;
 import com.massivecraft.massivecore.particleeffect.ParticleEffect.BlockData;
+import com.massivecraft.massivecore.particleeffect.ParticleEffect.ParticlePacket;
 import com.massivecraft.massivecore.ps.PS;
 import com.massivecraft.massivecore.util.IntervalUtil;
 import com.massivecraft.massivecore.util.MUtil;
@@ -32,7 +33,7 @@ import dk.muj.derius.api.util.AbilityUtil;
 import dk.muj.derius.lib.BlockUtil;
 import dk.muj.derius.lib.ItemUtil;
 
-public class Timber extends AbilityAbstract
+public class Timber extends AbilityAbstract<Block>
 {	
 	// -------------------------------------------- //
 	// INSTANCE & CONSTRUCT
@@ -87,9 +88,8 @@ public class Timber extends AbilityAbstract
 	// -------------------------------------------- //
 
 	@Override
-	public Object onActivate(DPlayer dplayer, Object other)
+	public Object onActivate(DPlayer dplayer, Block sourceBlock)
 	{
-		Block sourceBlock = (Block) other;
 		BlockState originalState = sourceBlock.getState();
 		
 		// Tree handling
@@ -106,20 +106,11 @@ public class Timber extends AbilityAbstract
 		// Debug message
 		//dplayer.msg(Txt.parse("You just have cut down %s logs and %s leaves.", logs, leaves));
 		
-		for (Block block : tree)
-		{
-			Location particleLoc = block.getLocation().add(0.5, 0.5, 0.5);
-			
-			ParticleEffect effect;
-			if (BlockUtil.isLog(block)) effect = ParticleEffect.CRIT;
-			else if (BlockUtil.isLeave(block)) effect = ParticleEffect.SLIME;
-			else continue;
-			
-			effect.display((float) 0.3, (float) 0.3, (float) 0.3, (float) 0.02, 30, particleLoc, 32);
-		}
+		this.displayParticles(tree);
 		
 		// Cut down the tree
-		tree.forEach(Block::breakNaturally);
+		ItemStack inHand = dplayer.getPlayer().getItemInHand();
+		tree.forEach(block -> block.breakNaturally(inHand));
 		
 		// Take away some damage of the item in hand
 		applyDamageToTool(dplayer, logs);
@@ -138,6 +129,33 @@ public class Timber extends AbilityAbstract
 		
 
 		return tree;
+	}
+	
+	private void displayParticles(Collection<Block> blocks)
+	{
+		// We need to enforce this.
+		ParticlePacket.initialize();
+		// This doesn't work on the default PartileEffect library because it is buggy.
+		// A PR is awaiting approval.
+		for (Block block : blocks)
+		{
+			Location particleLoc = block.getLocation().add(0.5, 1, 0.5);
+			
+			if (BlockUtil.isLeave(block))
+			{
+				BlockData data = new BlockData(block.getType(), block.getData());
+				ParticleEffect.BLOCK_DUST.display(data, (float) 0.2, (float) 0.2, (float) 0.2, (float) 0.001, 50, particleLoc, 16);
+				
+				BlockData logData = new BlockData(Material.LOG, block.getData());
+				ParticleEffect.BLOCK_DUST.display(logData, (float) 1, (float) 1, (float) 1, (float) 0.001, 10, particleLoc, 16);
+			}
+			else if (BlockUtil.isLog(block))
+			{
+				BlockData data = new BlockData(block.getType(), block.getData());
+				ParticleEffect.BLOCK_DUST.display(data, (float) 0.4, (float) 0.4, (float) 0.4, (float) 0.001, 50, particleLoc, 16);
+			}
+			else continue;
+		}
 	}
 
 	@Override public void onDeactivate(DPlayer dplayer, Object other) { }

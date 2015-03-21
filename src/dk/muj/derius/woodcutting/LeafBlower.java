@@ -16,7 +16,7 @@ import dk.muj.derius.api.skill.Skill;
 import dk.muj.derius.api.util.LevelUtil;
 import dk.muj.derius.lib.ItemUtil;
 
-public class LeafBlower extends AbilityAbstract
+public class LeafBlower extends AbilityAbstract<Block>
 {
 	// -------------------------------------------- //
 	// INSTANCE & CONSTRUCT
@@ -60,9 +60,8 @@ public class LeafBlower extends AbilityAbstract
 	}
 
 	@Override
-	public Object onActivate(DPlayer dplayer, Object other)
+	public Object onActivate(DPlayer dplayer, Block block)
 	{
-		Block block = (Block) other;
 		Player player = dplayer.getPlayer();
 		ItemStack item = player.getItemInHand();
 		
