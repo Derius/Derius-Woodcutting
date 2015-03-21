@@ -28,6 +28,7 @@ public final class DeriusWoodcutting extends MassivePlugin
 		Timber.get().register();
 		DoubleDrop.get().register();
 		LeafBlower.get().register();
+		CarefulCutting.get().register();
 		
 		DeriusAPI.registerExpGain(WoodcuttingExpGain.get());
 		EngineWoodcutting.get().activate();
