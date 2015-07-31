@@ -6,7 +6,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang.mutable.MutableBoolean;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -182,14 +181,14 @@ public class Timber extends AbilityAbstract<Block>
 		
 		// This boolean determines if we should look any further.
 		// it is set to false if an operation doesn't add anything to the return value.
-		MutableBoolean someLeft = new MutableBoolean(true);
+		boolean someLeft = true;
 		
 		// The latest added blocks, we use this to prevent looking through
 		// the same blocks multiple times.
 		// Initially it is just the source block.
 		Set<Block> latest = ret;
 		  
-		while (someLeft.booleanValue())
+		while (someLeft)
 		{
 			// The blocks we are going to add next time we modify return.
 			Set<Block> add = new HashSet<Block>();
@@ -209,7 +208,7 @@ public class Timber extends AbilityAbstract<Block>
 			);
 			// So if true is returned, we modified the return...
 			// and there might still be wood to find.
-			someLeft.setValue(ret.addAll(add));
+			someLeft |= ret.addAll(add);
 			// The latest added blocks are the ones we just added.
 			latest = add;	
 		}
@@ -226,7 +225,7 @@ public class Timber extends AbilityAbstract<Block>
 		if (BlockUtil.isAcacia(state)) return WoodcuttingSkill.getRadiusAcacia();
 		if (BlockUtil.isDarkOak(state)) return WoodcuttingSkill.getRadiusDarkOak();
 		
-		return 0;
+		throw new AssertionError();
 	}
 	
 	@SuppressWarnings("deprecation")
